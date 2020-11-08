@@ -16,9 +16,10 @@ namespace StoreLibrary
         public Store DefaultLocation { get; set; }
 
         // keep track of a customer's orders
-        // change to Ienumerable
-        private List<Order> orderList = new List<Order>();
+        // change to Ienumerable ??
+        public List<Order> OrderHistory { get; set; }
 
+        // does not initialize orderHistory
         public Customer(string social,string firstName, string lastName, string phoneNumber, Store defaultLocation)
         {
             Social = social;
@@ -26,14 +27,21 @@ namespace StoreLibrary
             LastName = lastName;
             PhoneNumber = phoneNumber;
             DefaultLocation = defaultLocation;
+            OrderHistory = new List<Order>();
+        }
+
+        // help method for testing
+        public void UpdateOrderHistory(Order order)
+        {
+            OrderHistory.Add(order);
         }
 
         // customer can place order to a store location 
         // implemented here?
-        public void PlaceOrder(Order newOrder, Store storeLocation)     
+        public void PlaceOrder(Store storeLocation, Order newOrder )     
         {
-            storeLocation.UpdateOrder(newOrder);
-        
+            storeLocation.UpdateStoreOrder(newOrder);
+            UpdateOrderHistory(newOrder);
         }
         
 

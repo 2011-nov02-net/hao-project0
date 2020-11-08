@@ -6,32 +6,72 @@ namespace StoreLibrary
 {
     public class Store
     {
-        // use the uniqueID to keep track of the same type of items
+        // use a uniqueID to keep track of the same type of items
         // convert Product type into string
-        private Dictionary<string, int> Inventory = new Dictionary<string, int>();
+        public string BranchID { get; set; }
+        public Dictionary<string, int> Inventory { get; set; }
 
-        // constructor
-        public Store(List<IProduct> supply)
+        // use a unique social to keep track of customer's profile
+        public Dictionary<string, List<Order>> CustomerDict { get; set; }
+
+        // constructor      
+        public Store(string branchID) {
+            BranchID = branchID;
+            Inventory = new Dictionary<string, int>();
+            CustomerDict = new Dictionary<string, List<Order>>();
+        }
+        public Store(string branchID, List<IProduct> supply)
         {
+            BranchID = branchID;
+            Inventory = new Dictionary<string, int>();
+            CustomerDict = new Dictionary<string, List<Order>>();
             foreach (var product in supply)
-            {
+            {              
                 Inventory[product.UniqueID] = product.Quantity;
+            }          
+        }
+
+        public void AddCustomer(Customer customer)
+        {
+            // create new profile
+            string social = customer.Social;
+
+            List<Order> orderHistory; 
+            if (CustomerDict.TryGetValue(social, out orderHistory))
+            {
+                // already exist
+            }
+            else
+            {
+                // not found, orderHistory set to default which is empty
+                CustomerDict[social] = customer.OrderHistory;
+            }          
+        }
+
+
+        public void UpdateStoreOrder(Order order)
+        {
+            // successful order gets stored
+            if (CheckUpdateInventory(order))
+            {
+                string social = order.Customer.Social;
+                // update customer's list of order after it has been accepted
+                List<Order> tempo;
+                if (CustomerDict.TryGetValue(social, out tempo))
+                {
+                    CustomerDict[social].Add(order);
+                }
+                else
+                { 
+                    CustomerDict[social] = new List<Order>();
+                    CustomerDict[social].Add(order);
+                }
+                
             }
             
         }
 
-        //
-        private List<Order> orderList = new List<Order>();
-
-        public void UpdateOrder(Order order)
-        {
-            // successful order gets stored
-            if(CheckUpdateInventory(order))
-                orderList.Add(order);
-            
-        }
-
-        // decrease inventory
+        // check and decrease inventory
         public bool CheckUpdateInventory(Order order)
         {
             // check type

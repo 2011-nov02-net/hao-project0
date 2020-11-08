@@ -51,7 +51,8 @@ namespace StoreLibrary
         // additional helper functions to add and remove some products to the productList
         public void AddOneProduct(IProduct product)
         {
-            productList.Add(product);
+            ProductList.Add(product);
+            // productList.Add(product);
         }
 
         // remove by type ? by a unique ID ?
