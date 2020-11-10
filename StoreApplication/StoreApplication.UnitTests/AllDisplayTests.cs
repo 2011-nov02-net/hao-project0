@@ -16,7 +16,7 @@ namespace StoreApplication.UnitTests
             IDisplay dis = new SimpleDisplay();
 
             List<IProduct> supply = new List<IProduct>
-            { new Product("111","apple","Produce",1.0,1),
+            { new Product("111","Banana","Produce",0.5,10),
               new Product("222","orange","Produce",0.88,10)};
 
             Store store = new Store("Phoenix101", supply);
@@ -33,7 +33,7 @@ namespace StoreApplication.UnitTests
             IDisplay dis = new SimpleDisplay();
 
             List<IProduct> supply = new List<IProduct>
-            { new Product("111","apple","Produce",1.0,1),
+            { new Product("111","Banana","Produce",0.5,10),
               new Product("222","orange","Produce",0.88,10)};
 
             Store store = new Store("Phoenix101", supply);

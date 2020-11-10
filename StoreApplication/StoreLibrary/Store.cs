@@ -15,6 +15,8 @@ namespace StoreLibrary
         public Dictionary<string, List<Order>> CustomerDict { get; set; }
 
         // constructor      
+
+        public Store() { }
         public Store(string branchID) {
             BranchID = branchID;
             Inventory = new Dictionary<string, int>();
