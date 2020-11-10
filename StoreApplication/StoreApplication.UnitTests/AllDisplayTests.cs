@@ -46,4 +46,5 @@ namespace StoreApplication.UnitTests
             dis.DisplayAllOrder(orders);
             Assert.True(true);
         }
+    }
 }

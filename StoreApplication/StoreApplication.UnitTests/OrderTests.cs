@@ -11,6 +11,7 @@ namespace StoreApplication.UnitTests
         [Fact]
         public void CreateAOrder()
         {
+            
             List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
                                                     new Product("222", "orange", "Produce", 0.88, 10) };
             Store store = new Store("Phoenix101");

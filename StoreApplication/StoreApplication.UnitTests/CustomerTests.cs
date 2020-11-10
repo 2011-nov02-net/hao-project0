@@ -32,9 +32,7 @@ namespace StoreApplication.UnitTests
             // temp
             List<Order> storeOrder = new List<Order>();
             storeOrder.Add(order);
-
             customer.UpdateOrderHistory(order);
-
             Assert.Equal(storeOrder,customer.OrderHistory);
         }
 
