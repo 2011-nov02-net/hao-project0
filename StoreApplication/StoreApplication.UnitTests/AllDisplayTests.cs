@@ -27,6 +27,7 @@ namespace StoreApplication.UnitTests
             Assert.True(true);
         }
 
+        [Fact]
         public void DisplayAllOrdersPrintOnConsole()
         {
             IDisplay dis = new SimpleDisplay();

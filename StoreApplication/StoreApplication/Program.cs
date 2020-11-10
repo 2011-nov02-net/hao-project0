@@ -18,8 +18,11 @@ namespace StoreApplication
             Store store = new Store("Phoenix101", supply);
             Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
             Order order = new Order(store, customer, DateTime.Today, supply);
+            Order order2 = new Order(store, customer, DateTime.Today, supply);
+            List<Order> orders = new List<Order>();
+            orders.Add(order); orders.Add(order2);
 
-            dis.DisplayOneOrder(order);
+            dis.DisplayAllOrder(orders);
         }
     }
 }
