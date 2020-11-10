@@ -9,7 +9,7 @@ namespace StoreLibrary
         // use a uniqueID to keep track of the same type of items
         // convert Product type into string
         public string BranchID { get; set; }
-        public Dictionary<string, int> Inventory { get; set; }
+        public Dictionary<string, IProduct> Inventory { get; set; }
 
         // use a unique social to keep track of customer's profile
         public Dictionary<string, List<Order>> CustomerDict { get; set; }
@@ -19,17 +19,17 @@ namespace StoreLibrary
         public Store() { }
         public Store(string branchID) {
             BranchID = branchID;
-            Inventory = new Dictionary<string, int>();
+            Inventory = new Dictionary<string, IProduct>();
             CustomerDict = new Dictionary<string, List<Order>>();
         }
         public Store(string branchID, List<IProduct> supply)
         {
             BranchID = branchID;
-            Inventory = new Dictionary<string, int>();
+            Inventory = new Dictionary<string, IProduct>();
             CustomerDict = new Dictionary<string, List<Order>>();
             foreach (var product in supply)
             {              
-                Inventory[product.UniqueID] = product.Quantity;
+                Inventory[product.UniqueID] = product;
             }          
         }
 
@@ -86,13 +86,13 @@ namespace StoreLibrary
                 // because of reference types, same objects may not be considered the same
                 // try string literals
                 string uniqueID = purchasedProduct.UniqueID;
-                int storage;
+                IProduct storage;
                 // find the product in the store inventory
                 if (Inventory.TryGetValue(uniqueID, out storage))
                 {
                     // found
                     // but not enough 
-                    if (storage < purchasedProduct.Quantity)
+                    if (storage.Quantity < purchasedProduct.Quantity)
                     {
                         return false;
                     }
@@ -116,7 +116,7 @@ namespace StoreLibrary
                 foreach (var purchasedProduct in order.ProductList)
                 {
                     // update inventory
-                    Inventory[purchasedProduct.UniqueID] -= purchasedProduct.Quantity;
+                    Inventory[purchasedProduct.UniqueID].Qu -= purchasedProduct.Quantity;
                 }
             }
             return true;

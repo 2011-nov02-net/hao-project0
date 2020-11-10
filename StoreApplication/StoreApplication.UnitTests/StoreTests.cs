@@ -19,7 +19,7 @@ namespace StoreApplication.UnitTests
             Assert.Equal("Phoenix101", store.BranchID );
             foreach (var product in supply)
             {
-                Assert.Equal(product.Quantity, store.Inventory[product.UniqueID]);
+                Assert.Equal(product.Quantity, store.Inventory[product.UniqueID].Quantity);
             }
 
         }
