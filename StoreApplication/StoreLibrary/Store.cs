@@ -12,7 +12,7 @@ namespace StoreLibrary
         public Dictionary<string, IProduct> Inventory { get; set; }
 
         // use a unique social to keep track of customer's profile
-        public Dictionary<string, List<Order>> CustomerDict { get; set; }
+        public Dictionary<string, Customer> CustomerDict { get; set; }
 
         // constructor      
 
@@ -20,13 +20,13 @@ namespace StoreLibrary
         public Store(string branchID) {
             BranchID = branchID;
             Inventory = new Dictionary<string, IProduct>();
-            CustomerDict = new Dictionary<string, List<Order>>();
+            CustomerDict = new Dictionary<string, Customer>();
         }
         public Store(string branchID, List<IProduct> supply)
         {
             BranchID = branchID;
             Inventory = new Dictionary<string, IProduct>();
-            CustomerDict = new Dictionary<string, List<Order>>();
+            CustomerDict = new Dictionary<string, Customer>();
             foreach (var product in supply)
             {              
                 Inventory[product.UniqueID] = product;
@@ -38,35 +38,37 @@ namespace StoreLibrary
             // create new profile
             string social = customer.Social;
 
-            List<Order> orderHistory; 
-            if (CustomerDict.TryGetValue(social, out orderHistory))
+            Customer tempo; 
+            if (CustomerDict.TryGetValue(social, out tempo))
             {
-                // already exist
+                // already exist, no need to add 
             }
             else
             {
-                // not found, orderHistory set to default which is empty
-                CustomerDict[social] = customer.OrderHistory;
+                // not found, create a new customer profile
+                CustomerDict[social] = customer;
             }          
         }
 
 
-        public void UpdateStoreOrder(Order order)
+        public void UpdateCustomerOrder(Order order)
         {
-            // successful order gets stored
+            // only successful order gets updated
             if (CheckUpdateInventory(order))
             {
+                // need to change
                 string social = order.Customer.Social;
                 // update customer's list of order after it has been accepted
-                List<Order> tempo;
+                Customer tempo;
                 if (CustomerDict.TryGetValue(social, out tempo))
                 {
-                    CustomerDict[social].Add(order);
+                    // CustomerDict[social].OrderHistory.Add(order);
+                    CustomerDict[social].UpdateOrderHistory(order);
                 }
                 else
-                { 
-                    CustomerDict[social] = new List<Order>();
-                    CustomerDict[social].Add(order);
+                {
+                    CustomerDict[social] =  order.Customer;
+                    CustomerDict[social].UpdateOrderHistory(order);
                 }
                 
             }
@@ -116,7 +118,7 @@ namespace StoreLibrary
                 foreach (var purchasedProduct in order.ProductList)
                 {
                     // update inventory
-                    Inventory[purchasedProduct.UniqueID].Qu -= purchasedProduct.Quantity;
+                    Inventory[purchasedProduct.UniqueID].Quantity -= purchasedProduct.Quantity;
                 }
             }
             return true;

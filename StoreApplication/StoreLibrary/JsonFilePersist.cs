@@ -26,7 +26,7 @@ namespace StoreLibrary
             File.WriteAllText(path,json);
         }
 
-        // multiple ways to read
+        
         public Store ReadStoreData()
         {
             Store data;
@@ -34,8 +34,13 @@ namespace StoreLibrary
             {
                 string json = File.ReadAllText(path);
                 // object cycle
-
-                data = JsonConvert.DeserializeObject<Store>(json);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Converters.Add(new Newtonsoft.Json.Converters.JavaScriptDateTimeConverter());
+                data = JsonConvert.DeserializeObject<Store>(json, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    NullValueHandling = NullValueHandling.Ignore,
+                });
             }
             catch (FileNotFoundException e)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -11,14 +12,18 @@ namespace StoreLibrary
         public string Social { get; set; }
         public string FirstName{ get; set; }
         public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-
-        public Store DefaultLocation { get; set; }
+        public string PhoneNumber { get; set; }   
 
         // keep track of a customer's orders
         // change to Ienumerable ??
         public List<Order> OrderHistory { get; set; }
 
+        [JsonIgnore]
+        public Store DefaultLocation { get; set; }
+
+
+        public Customer()
+        { OrderHistory = new List<Order>(); }
         // does not initialize orderHistory
         public Customer(string social,string firstName, string lastName, string phoneNumber, Store defaultLocation)
         {
@@ -30,7 +35,7 @@ namespace StoreLibrary
             OrderHistory = new List<Order>();
         }
 
-        // help method for testing
+        // helper method for updating 
         public void UpdateOrderHistory(Order order)
         {
             OrderHistory.Add(order);
@@ -40,8 +45,8 @@ namespace StoreLibrary
         // implemented here?
         public void PlaceOrder(Store storeLocation, Order newOrder )     
         {
-            storeLocation.UpdateStoreOrder(newOrder);
-            UpdateOrderHistory(newOrder);
+            storeLocation.UpdateCustomerOrder(newOrder);
+            // UpdateOrderHistory(newOrder);
         }
         
 

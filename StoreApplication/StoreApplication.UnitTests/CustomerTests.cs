@@ -28,33 +28,32 @@ namespace StoreApplication.UnitTests
             Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
             List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
                                                     new Product("222", "orange", "Produce", 0.88, 10)};        
-            Order order = new Order(store, customer, DateTime.Today, p);
-            // temp
-            List<Order> storeOrder = new List<Order>();
-            storeOrder.Add(order);
+            Order order = new Order(store, customer, DateTime.Today, p);                  
             customer.UpdateOrderHistory(order);
-            Assert.Equal(storeOrder,customer.OrderHistory);
+            for (int i = 0; i < p.Count; i ++)
+            {
+                Assert.Equal(p[i].UniqueID, customer.OrderHistory[0].ProductList[i].UniqueID);
+            }
+         
         }
 
         [Fact]
         public void CustomerPlaceOrder()
         {
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
+            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
                                                     new Product("222", "orange", "Produce", 0.88, 10)};
-            Store store = new Store("Phoenix101",supply);
+            Store store = new Store("Phoenix101",p);
             Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
             // orders the same as the store's inventory
-            Order order = new Order(store, customer, DateTime.Today, supply);
+            Order order = new Order(store, customer, DateTime.Today, p);
 
             customer.PlaceOrder(store, order);
             // comparing customer' orderHistroy with store's customerDict
             // making sure the order has been handed from the customer to the store
-            Assert.Equal(customer.OrderHistory[0].StoreLocation.BranchID, store.CustomerDict["123123121"][0].StoreLocation.BranchID );
-            Assert.Equal(customer.OrderHistory[0].Customer.Social,store.CustomerDict["123123121"][0].Customer.Social);
-            Assert.Equal(customer.OrderHistory[0].OrderedTime, store.CustomerDict["123123121"][0].OrderedTime);
-            Assert.Equal(customer.OrderHistory[0].ProductList, store.CustomerDict["123123121"][0].ProductList);
-            
-     
+            for (int i = 0; i < p.Count; i++)
+            {
+                Assert.Equal(p[i].UniqueID, store.CustomerDict["123123121"].OrderHistory[0].ProductList[i].UniqueID);
+            }
         }
     }
 }

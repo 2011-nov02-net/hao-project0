@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
+
 
 namespace StoreLibrary
 {
     public class Order
     {
-
+        [JsonIgnore]
         public Store StoreLocation { get; set; }
 
+        [JsonIgnore]
         public Customer Customer { get; set; }
 
         // keep track of ordered time
@@ -16,6 +19,7 @@ namespace StoreLibrary
 
         // multiple kinds of product -> interface  
         private List<IProduct> productList = new List<IProduct>();
+      
         public List<IProduct> ProductList {
             get
             { return productList; }
