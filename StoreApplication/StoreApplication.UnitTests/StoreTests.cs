@@ -41,6 +41,6 @@ namespace StoreApplication.UnitTests
             }
         }
 
-        // updatestoreorder and checkupdateinventory have been tested in customertests
+        // updatecustomerorder and checkupdateinventory have been tested in customer tests
     }
 }

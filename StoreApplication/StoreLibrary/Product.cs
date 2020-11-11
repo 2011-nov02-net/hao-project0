@@ -6,6 +6,7 @@ namespace StoreLibrary
 {
     public class Product: IProduct
     {
+        // use a uniqueID to keep track of the same type of items
         public string UniqueID { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }

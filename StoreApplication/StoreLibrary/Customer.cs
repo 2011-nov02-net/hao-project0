@@ -21,10 +21,9 @@ namespace StoreLibrary
         [JsonIgnore]
         public Store DefaultLocation { get; set; }
 
-
         public Customer()
         { OrderHistory = new List<Order>(); }
-        // does not initialize orderHistory
+
         public Customer(string social,string firstName, string lastName, string phoneNumber, Store defaultLocation)
         {
             Social = social;
@@ -34,19 +33,11 @@ namespace StoreLibrary
             DefaultLocation = defaultLocation;
             OrderHistory = new List<Order>();
         }
-
-        // helper method for updating 
-        public void UpdateOrderHistory(Order order)
-        {
-            OrderHistory.Add(order);
-        }
-
+       
         // customer can place order to a store location 
-        // implemented here?
         public void PlaceOrder(Store storeLocation, Order newOrder )     
         {
             storeLocation.UpdateCustomerOrder(newOrder);
-            // UpdateOrderHistory(newOrder);
         }
         
 

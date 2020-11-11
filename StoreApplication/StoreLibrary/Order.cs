@@ -31,10 +31,9 @@ namespace StoreLibrary
                 {
                     quantity += p.Quantity;
                 }
-                if (quantity >= 200)
+                if (quantity >= 500)
                 {
-                    // how to reject
-                    // try set productList and catch exception to handle rejection
+                    // nned to handle rejection
                     throw new ArgumentException("This order contains high quantity of products");
                 }
                 // set a list
@@ -49,17 +48,7 @@ namespace StoreLibrary
             ProductList = productList;
         }
 
-        // methods
-        // rejects orders with unreasonably high product quantities
-
-        // additional helper functions to add and remove some products to the productList
-        public void AddOneProduct(IProduct product)
-        {
-            ProductList.Add(product);
-            // productList.Add(product);
-        }
-
-        // remove by type ? by a unique ID ?
+        // remove by unique ID
         public void RemoveOneProduct(IProduct product)
         { 
             

@@ -19,40 +19,91 @@ namespace StoreApplication.UnitTests
             Assert.Equal("Smith", customer.LastName);
             Assert.Equal("6021111111", customer.PhoneNumber);
             Assert.Equal(store, customer.DefaultLocation);
-        }
+        }    
 
         [Fact]
-        public void CustomerUpdateOrderHistory()
+        public void CustomerPlacedASuccessfulOrder()
         {
-            Store store = new Store("Phoenix101");
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10)};        
-            Order order = new Order(store, customer, DateTime.Today, p);                  
-            customer.UpdateOrderHistory(order);
-            for (int i = 0; i < p.Count; i ++)
-            {
-                Assert.Equal(p[i].UniqueID, customer.OrderHistory[0].ProductList[i].UniqueID);
-            }
-         
-        }
-
-        [Fact]
-        public void CustomerPlaceOrder()
-        {
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
+            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
                                                     new Product("222", "orange", "Produce", 0.88, 10)};
-            Store store = new Store("Phoenix101",p);
+            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 4),
+                                                    new Product("222", "orange", "Produce", 0.88, 4)};
+            Store store = new Store("Phoenix101",supply);
             Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            // orders the same as the store's inventory
             Order order = new Order(store, customer, DateTime.Today, p);
-
             customer.PlaceOrder(store, order);
-            // comparing customer' orderHistroy with store's customerDict
-            // making sure the order has been handed from the customer to the store
-            for (int i = 0; i < p.Count; i++)
+            // inventory should be updated 10-4=6
+            foreach (var item in store.Inventory)
             {
-                Assert.Equal(p[i].UniqueID, store.CustomerDict["123123121"].OrderHistory[0].ProductList[i].UniqueID);
+                Assert.Equal(6, item.Value.Quantity);
+            }
+        }
+
+        [Fact]
+        public void CustomerWithoutProfileFailedToPlaceAnOrder()
+        {
+            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
+                                                    new Product("222", "orange", "Produce", 0.88, 10)};
+            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 20),
+                                                    new Product("222", "orange", "Produce", 0.88, 20)};
+            Store store = new Store("Phoenix101", supply);
+            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
+            Order order = new Order(store, customer, DateTime.Today, p);
+            customer.PlaceOrder(store, order);
+
+            // inventory should not be updated 10-20<0 => 10
+            foreach (var item in store.Inventory)
+            {
+                Assert.Equal(10, item.Value.Quantity);
+            }
+            
+            // customer does not have an existing profile 
+            // a failed order doesn not create a new user profile
+            // userDict should be empty
+            // .Equal 0 does not check a collection size
+            Assert.Empty(store.CustomerDict);
+        }
+
+        [Fact]
+        public void CustomerWithProfileFailedToPlaceAnOrder()
+        {
+            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
+                                                    new Product("222", "orange", "Produce", 0.88, 10)};
+            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 20),
+                                                    new Product("222", "orange", "Produce", 0.88, 20)};
+            Store store = new Store("Phoenix101", supply);
+            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
+            Order order = new Order(store, customer, DateTime.Today, p);
+            // customer has an existing profile
+            store.AddCustomer(customer);
+            customer.PlaceOrder(store, order);
+
+            // inventory should not be updated 10-20<0 => 10
+            foreach (var item in store.Inventory)
+            {
+                Assert.Equal(10, item.Value.Quantity);
+            }
+
+            // userDict should have customer file, but with no order history
+            Assert.Empty(store.CustomerDict["123123121"].OrderHistory);
+        }
+
+        [Fact]
+        public void CustomerPurchasedTooMany()
+        {
+            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
+                                                    new Product("222", "orange", "Produce", 0.88, 10)};
+            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 2000),
+                                                    new Product("222", "orange", "Produce", 0.88, 2000)};
+            Store store = new Store("Phoenix101", supply);
+            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
+            try
+            {
+                Order order = new Order(store, customer, DateTime.Today, p);
+            }
+            catch (ArgumentException e)
+            {
+                Assert.Equal("This order contains high quantity of products", e.ToString());
             }
         }
     }

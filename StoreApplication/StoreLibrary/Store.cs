@@ -5,17 +5,15 @@ using System.Text;
 namespace StoreLibrary
 {
     public class Store
-    {
-        // use a uniqueID to keep track of the same type of items
-        // convert Product type into string
+    {     
+        // unique
         public string BranchID { get; set; }
         public Dictionary<string, IProduct> Inventory { get; set; }
 
-        // use a unique social to keep track of customer's profile
+        // use a unique social to keep track of customers
         public Dictionary<string, Customer> CustomerDict { get; set; }
 
-        // constructor      
-
+        // multiple constructors      
         public Store() { }
         public Store(string branchID) {
             BranchID = branchID;
@@ -31,6 +29,21 @@ namespace StoreLibrary
             {              
                 Inventory[product.UniqueID] = product;
             }          
+        }
+
+        public void AddProducts(List<IProduct> supply)
+        {
+            foreach (var product in supply)
+            {
+                IProduct temp;
+                if(Inventory.TryGetValue(product.UniqueID, out temp))
+                {
+                    Inventory[product.UniqueID].Quantity += product.Quantity;        
+
+                }
+                else
+                    Inventory[product.UniqueID] = product;
+            }
         }
 
         public void AddCustomer(Customer customer)
@@ -62,13 +75,12 @@ namespace StoreLibrary
                 Customer tempo;
                 if (CustomerDict.TryGetValue(social, out tempo))
                 {
-                    // CustomerDict[social].OrderHistory.Add(order);
-                    CustomerDict[social].UpdateOrderHistory(order);
+                    CustomerDict[social].OrderHistory.Add(order);                    
                 }
                 else
                 {
                     CustomerDict[social] =  order.Customer;
-                    CustomerDict[social].UpdateOrderHistory(order);
+                    CustomerDict[social].OrderHistory.Add(order);
                 }
                 
             }

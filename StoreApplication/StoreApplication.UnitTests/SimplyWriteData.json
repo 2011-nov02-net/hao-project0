@@ -1,1 +1,89 @@
-{"BranchID":"Phoenix101","Inventory":{"111":{"UniqueID":"111","Name":"Banana","Category":"Produce","Price":0.5,"Quantity":0},"222":{"UniqueID":"222","Name":"orange","Category":"Produce","Price":0.88,"Quantity":0}},"CustomerDict":{"123123121":{"Social":"123123121","FirstName":"John","LastName":"Smith","PhoneNumber":"6021111111","OrderHistory":[{"OrderedTime":"2020-11-10T00:00:00-07:00","ProductList":[{"UniqueID":"111","Name":"Banana","Category":"Produce","Price":0.5,"Quantity":0},{"UniqueID":"222","Name":"orange","Category":"Produce","Price":0.88,"Quantity":0}]}]}}}
+{
+  "BranchID": "Phoenix101",
+  "Inventory": {
+    "111": {
+      "$type": "StoreLibrary.Product, StoreLibrary",
+      "UniqueID": "111",
+      "Name": "Banana",
+      "Category": "Produce",
+      "Price": 0.5,
+      "Quantity": 15
+    },
+    "222": {
+      "$type": "StoreLibrary.Product, StoreLibrary",
+      "UniqueID": "222",
+      "Name": "orange",
+      "Category": "Produce",
+      "Price": 0.88,
+      "Quantity": 15
+    },
+    "333": {
+      "$type": "StoreLibrary.Product, StoreLibrary",
+      "UniqueID": "333",
+      "Name": "Rocket",
+      "Category": "Transport",
+      "Price": 1000000.0,
+      "Quantity": 15
+    }
+  },
+  "CustomerDict": {
+    "123123121": {
+      "Social": "123123121",
+      "FirstName": "John",
+      "LastName": "Smith",
+      "PhoneNumber": "6021111111",
+      "OrderHistory": [
+        {
+          "OrderedTime": "2020-11-10T00:00:00-07:00",
+          "ProductList": [
+            {
+              "$type": "StoreLibrary.Product, StoreLibrary",
+              "UniqueID": "111",
+              "Name": "Banana",
+              "Category": "Produce",
+              "Price": 0.5,
+              "Quantity": 4
+            },
+            {
+              "$type": "StoreLibrary.Product, StoreLibrary",
+              "UniqueID": "222",
+              "Name": "orange",
+              "Category": "Produce",
+              "Price": 0.88,
+              "Quantity": 4
+            }
+          ]
+        }
+      ]
+    },
+    "127137147": {
+      "Social": "127137147",
+      "FirstName": "Adam",
+      "LastName": "Savage",
+      "PhoneNumber": "4801111111",
+      "OrderHistory": [
+        {
+          "OrderedTime": "2020-11-10T00:00:00-07:00",
+          "ProductList": [
+            {
+              "$type": "StoreLibrary.Product, StoreLibrary",
+              "UniqueID": "111",
+              "Name": "Banana",
+              "Category": "Produce",
+              "Price": 0.5,
+              "Quantity": 1
+            },
+            {
+              "$type": "StoreLibrary.Product, StoreLibrary",
+              "UniqueID": "222",
+              "Name": "orange",
+              "Category": "Produce",
+              "Price": 0.88,
+              "Quantity": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
