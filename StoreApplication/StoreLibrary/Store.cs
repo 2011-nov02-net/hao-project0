@@ -90,11 +90,20 @@ namespace StoreLibrary
         // check and decrease inventory
         public bool CheckUpdateInventory(Order order)
         {
-            // check type
-            // check quantity
-            // update quantity
-            
-            int counter = 0;
+            // all requirement met
+            if (CheckInventory(order))
+            {
+                foreach (var purchasedProduct in order.ProductList)
+                {
+                    // update inventory
+                    Inventory[purchasedProduct.UniqueID].Quantity -= purchasedProduct.Quantity;
+                }
+            }
+            return true;
+        }
+
+        public bool CheckInventory(Order order)
+        {
             foreach (var purchasedProduct in order.ProductList)
             {
                 // because of reference types, same objects may not be considered the same
@@ -114,26 +123,17 @@ namespace StoreLibrary
                     else
                     {
                         // one product's quantity has qualified
-                        counter++;
+                      
                     }
                 }
-                else 
+                else
                 {
                     // not found
                     return false;
                 }
             }
-
-            // all requirement met
-            if (counter == order.ProductList.Count)
-            {
-                foreach (var purchasedProduct in order.ProductList)
-                {
-                    // update inventory
-                    Inventory[purchasedProduct.UniqueID].Quantity -= purchasedProduct.Quantity;
-                }
-            }
             return true;
+
         }
     }
 }
