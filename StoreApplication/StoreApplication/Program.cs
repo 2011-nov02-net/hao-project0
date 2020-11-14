@@ -17,7 +17,7 @@ namespace StoreApplication
 
             // all inputs have a validation method to process IValid
             // to do
-            string init = Console.ReadLine()
+            string init = Console.ReadLine();
             while (init != "x")
             {
                 // read from databse
@@ -44,18 +44,25 @@ namespace StoreApplication
                     List<IProduct> productList = ProductsSetup();
                     // location, customer, orderedtime, productList
                     // create an order
-                    Order newOrder = new Order(store, customer, DateTime.Now, productList);
-                    if (store.CheckInventory(newOrder))
+                    // exception handling here
+                    bool isSuccessful = false;
+                    Order newOrder = new Order();
+                    try
                     {
-                        try
-                        {
+                        newOrder = new Order(store, customer, DateTime.Now, productList);
+                        isSuccessful = true;
+                        Console.WriteLine("Order placed successfully!");
+                    }
+                    catch (ArgumentException e)
+                    {
+                        isSuccessful = false;
+                        Console.WriteLine("This order exceeds the max allowed quantities");
+                    }   
+
+                    if (store.CheckInventory(newOrder) && isSuccessful)
+                    {
                             customer.PlaceOrder(store, newOrder);
                             Console.WriteLine("Order placed successfullly");
-                        }
-                        catch (ArgumentException e)
-                        {
-                            Console.WriteLine("This order contains too many products!");
-                        }
                     }
                     else
                     {

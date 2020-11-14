@@ -40,6 +40,9 @@ namespace StoreLibrary
                 productList = value;
             } }
 
+        public Order()
+        { }
+
         public Order(Store storeLocation, Customer customer,DateTime orderedTime,List<IProduct> productList )
         {
             StoreLocation = storeLocation;
