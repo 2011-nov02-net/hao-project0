@@ -5,6 +5,19 @@ insert into product(productid,name,category,price) values('p102','regular coke',
 insert into product(productid,name,category,price) values('p103','pizza','frozen food',3.0);
 insert into product(productid,name,category,price) values('p104','milk','diary',4.0);
 
+-- insert customer
+insert into customer(customerid,firstname,lastname,phonenumber) values('cus1','John','Smith','6021231234');
+insert into customer(customerid,firstname,lastname,phonenumber) values('cus2','Adam','Savage','4801231234');
+insert into customer(customerid,firstname,lastname,phonenumber) values('cus3','King','Kong','9291231234');
+insert into customer(customerid,firstname,lastname,phonenumber) values('cus4','Tim','Cook','7771231234');
+
+-- insert store
+insert into store(storeloc,storephone) values('Central Ave 1', '1111111111');
+insert into store(storeloc,storephone) values('South Ave 2', '2222222222');
+insert into store(storeloc,storephone) values('Mountain View 3', '3333333333');
+insert into store(storeloc,storephone) values('River View 4', '4444444444');
+
+
 -- insert order
 -- recalculate total for total cost
 -- total
@@ -32,19 +45,6 @@ insert into orderproduct(orderid,productid,quantity) values('o003','p103',3);
 insert into orderproduct(orderid,productid,quantity) values('o004','p104',4);
 
 
--- insert customer
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus1','John','Smith','6021231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus2','Adam','Savage','4801231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus3','King','Kong','9291231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus4','Tim','Cook','7771231234');
-
--- insert store
-insert into store(storeloc,storephone) values('Central Ave 1', '1111111111');
-insert into store(storeloc,storephone) values('South Ave 2', '2222222222');
-insert into store(storeloc,storephone) values('Mountain View 3', '3333333333');
-insert into store(storeloc,storephone) values('River View 4', '4444444444');
-
-
 
 -- insert bridges store - product
 insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p101',10);
@@ -67,7 +67,7 @@ select* from inventory;
 select* from storecustomer;
 
 
-select o.orderid,p.productid,op.quantity,o.totalcost
+select o.orderid,p.productid,op.quantity,p.price,o.totalcost
 from orderr o 
 join orderproduct op on o.orderid = op.orderid
 join product p on op.productid = p.productid
