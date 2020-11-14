@@ -127,12 +127,12 @@ namespace StoreApplication
                 string category = Console.ReadLine();
 
                 Console.WriteLine("Enter Product price");
-                double price = Double.TryParse(Console.ReadLine(), price);
+                //double price = Double.TryParse(Console.ReadLine(), price);
 
                 Console.WriteLine("Enter Product quantity");
-                int quantity = Console.ReadLine();
-                Product p = new Product(id, name, category, price, quantity);
-                productList.Add(p);
+                //int quantity = Console.ReadLine();
+                //Product p = new Product(id, name, category, price, quantity);
+                //productList.Add(p);
             }
             return productList;
 
