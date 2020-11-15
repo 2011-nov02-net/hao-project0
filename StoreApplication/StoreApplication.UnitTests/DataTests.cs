@@ -23,9 +23,9 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
                                                     new CProduct("222", "orange", "Produce", 0.88, 4)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             // orders the same as the store's inventory
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             SimpleDisplay dis = new SimpleDisplay();
            
             string path = "../../../SimplyWriteData.json";
@@ -65,10 +65,10 @@ namespace StoreApplication.UnitTests
                                                 new CProduct("333","Rocket","Transport",1000000,15)};
                                                     
             store.AddProducts(supply);
-            CCustomer customer = new CCustomer("127137147", "Adam", "Savage", "4801111111", store);
+            CCustomer customer = new CCustomer("127137147", "Adam", "Savage", "4801111111");
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 1),
                                                     new CProduct("222", "orange", "Produce", 0.88, 1)};
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             customer.PlaceOrder(store, order);
 
             persist.WriteStoreData(store);

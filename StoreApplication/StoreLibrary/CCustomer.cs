@@ -35,13 +35,7 @@ namespace StoreLibrary
         /// property to keep track of all orders of a customer
         /// </summary>
         public List<COrder> OrderHistory { get; set; } = new List<COrder>();
-
-        /// <summary>
-        /// property to reference a default location where a customer makes purchases
-        /// </summary>
-        [JsonIgnore]
-        public CStore DefaultLocation { get; set; }
-
+    
         /// <summary>
         /// default constructor
         /// </summary>
@@ -51,13 +45,12 @@ namespace StoreLibrary
         /// <summary>
         /// parameterized constructor
         /// </summary>
-        public CCustomer(string customerid,string firstName, string lastName, string phoneNumber, CStore defaultLocation)
+        public CCustomer(string customerid,string firstName, string lastName, string phoneNumber)
         {
             Customerid = customerid;
             FirstName = firstName;
             LastName = lastName;
-            PhoneNumber = phoneNumber;
-            DefaultLocation = defaultLocation;        
+            PhoneNumber = phoneNumber;    
         }
 
         /// <summary>

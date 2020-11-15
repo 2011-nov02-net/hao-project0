@@ -38,6 +38,7 @@ namespace StoreLibrary
                 {
                     throw new ArgumentException("price must be positive");
                 }
+                price = value;
             }
         }
 
@@ -55,6 +56,8 @@ namespace StoreLibrary
                 {
                     throw new ArgumentException("quantity must be positive");
                 }
+                quantity = value;
+                
             }
         }
       

@@ -8,7 +8,7 @@ using Xunit;
 namespace StoreApplication.UnitTests
 {
     /// <summary>
-    /// unit test cases for name search class
+    /// unit test cases for simple search class
     /// </summary>
     public class NameSearchTests
     {
@@ -25,13 +25,14 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
                                                     new CProduct("222", "orange", "Produce", 0.88, 4)};
             CStore store= new CStore("Phoenix101",supply);
-            CCustomer customer = new CCustomer("123123121","John","Smith","6021111111",store);
+            CCustomer customer = new CCustomer("123123121","John","Smith","6021111111");
 
-            COrder order = new COrder(store,customer,DateTime.Today,p);
+            COrder order = new COrder(store,customer,DateTime.Today, 100, p);
             customer.PlaceOrder(store,order);
-            ISearch searchTool = new NameSearch();
+            ISearch searchTool = new SimpleSearch();
             // act
-            bool result = searchTool.Search(store, customer);
+            string customerid;
+            bool result = searchTool.SearchByName(store, "John", "Smith", out customerid);
 
 
             // assert

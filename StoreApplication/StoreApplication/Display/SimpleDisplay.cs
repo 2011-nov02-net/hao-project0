@@ -6,14 +6,13 @@ using System.Text;
 namespace StoreApplication.Display
 {
     /// <summary>
-    /// default display function
+    /// simple approach of all display functions
     /// </summary>
     public class SimpleDisplay : IDisplay
     {
         /// <summary>
         /// only display detail of an order
         /// </summary>
-        /// <param name="order"></param>
         public void DisplayOneOrder(COrder order)
         {
             string location = order.StoreLocation.Storeloc;
@@ -30,8 +29,7 @@ namespace StoreApplication.Display
         /// <summary>
         /// display detail of multiple orders
         /// </summary>
-        /// <param name="orders"></param>
-        public void DisplayAllOrder(List<COrder> orders)
+        public void DisplayAllOrders(List<COrder> orders)
         {
             foreach (var order in orders)
             {

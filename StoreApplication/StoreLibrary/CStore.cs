@@ -127,7 +127,7 @@ namespace StoreLibrary
         /// </summary>
         public void UpdateInventory(COrder order)
         {
-            // double checking
+            // double checking just in case this method is called independently
             if (CheckInventory(order))
             {
                 foreach (var purchasedProduct in order.ProductList)

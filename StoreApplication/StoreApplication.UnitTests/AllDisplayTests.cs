@@ -15,7 +15,6 @@ namespace StoreApplication.UnitTests
         /// <summary>
         /// testing the ability to simple display an order
         /// </summary>
-        /// 
         // move codes here to Main program for testing
         [Fact]
         public void DisplayOneOrderPrintOnConsole()
@@ -27,8 +26,8 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
                                                     new CProduct("222", "orange", "Produce", 0.88, 4)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             dis.DisplayOneOrder(order);
             Assert.True(true);
         }
@@ -46,11 +45,11 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
                                                     new CProduct("222", "orange", "Produce", 0.88, 4)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             List<COrder> orders = new List<COrder>
-            {  new COrder(store, customer, DateTime.Today, p),
-                new COrder(store, customer, DateTime.Today, p) };                
-            dis.DisplayAllOrder(orders);
+            {  new COrder(store, customer, DateTime.Today, 100, p),
+                new COrder(store, customer, DateTime.Today, 100, p) };                
+            dis.DisplayAllOrders(orders);
             Assert.True(true);
         }
     }

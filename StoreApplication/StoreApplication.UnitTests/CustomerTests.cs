@@ -18,12 +18,11 @@ namespace StoreApplication.UnitTests
         public void CreateACustomer()
         {
             CStore store = new CStore("Phoenix101");
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             Assert.Equal("123123121", customer.Customerid);
             Assert.Equal("John", customer.FirstName);
             Assert.Equal("Smith", customer.LastName);
-            Assert.Equal("6021111111", customer.PhoneNumber);
-            Assert.Equal(store, customer.DefaultLocation);
+            Assert.Equal("6021111111", customer.PhoneNumber);        
         }    
 
         /// <summary>
@@ -37,8 +36,8 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
                                                     new CProduct("222", "orange", "Produce", 0.88, 4)};
             CStore store = new CStore("Phoenix101",supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             customer.PlaceOrder(store, order);
             // inventory should be updated 10-4=6
             foreach (var item in store.Inventory)
@@ -58,8 +57,8 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 20),
                                                     new CProduct("222", "orange", "Produce", 0.88, 20)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             customer.PlaceOrder(store, order);
 
             // inventory should not be updated 10-20<0 => 10
@@ -86,8 +85,8 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 20),
                                                     new CProduct("222", "orange", "Produce", 0.88, 20)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
-            COrder order = new COrder(store, customer, DateTime.Today, p);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
+            COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             // customer has an existing profile
             store.AddCustomer(customer);
             customer.PlaceOrder(store, order);
@@ -113,10 +112,10 @@ namespace StoreApplication.UnitTests
             List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 2000),
                                                     new CProduct("222", "orange", "Produce", 0.88, 2000)};
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             try
             {
-                COrder order = new COrder(store, customer, DateTime.Today, p);
+                COrder order = new COrder(store, customer, DateTime.Today, 100, p);
             }
             catch (ArgumentException e)
             {

@@ -41,7 +41,7 @@ namespace StoreApplication.UnitTests
               new CProduct("222","orange","Produce",0.88,10)};
 
             CStore store = new CStore("Phoenix101", supply);
-            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             store.AddCustomer(customer);
             foreach (var pair in store.CustomerDict)
             {

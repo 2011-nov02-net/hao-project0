@@ -10,7 +10,7 @@ using System.Text;
 namespace StoreLibrary
 {
     /// <summary>
-    /// persistent file handling
+    /// persistent data handling
     /// </summary>
     public class JsonFilePersist
     {
@@ -18,7 +18,6 @@ namespace StoreLibrary
         /// <summary>
         /// default constructor
         /// </summary>
-        /// <param name="cpath"></param>
         public JsonFilePersist(string cpath)
         {
             path = cpath;
@@ -27,7 +26,6 @@ namespace StoreLibrary
         /// <summary>
         /// behavior to serialize and write data
         /// </summary>
-        /// <param name="data"></param>
         public void WriteStoreData(CStore data)
         {
             JsonSerializer serializer = new JsonSerializer();
@@ -50,7 +48,6 @@ namespace StoreLibrary
         /// behavior to read data and deserialize
         /// have jsonignore on console order class to avoid object cycle
         /// </summary>
-        /// <returns></returns>
         public CStore ReadStoreData()
         {
             CStore data;

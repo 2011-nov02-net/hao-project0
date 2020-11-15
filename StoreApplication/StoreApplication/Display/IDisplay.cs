@@ -14,6 +14,6 @@ namespace StoreApplication.Display
         void DisplayOneOrder(COrder order);
 
         // for store and customer
-        void DisplayAllOrder(List<COrder> orders);
+        void DisplayAllOrders(List<COrder> orders);
     }
 }

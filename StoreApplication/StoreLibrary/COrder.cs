@@ -29,7 +29,7 @@ namespace StoreLibrary
         public CCustomer Customer { get; set; }
 
         /// <summary>
-        /// property to record date and time of an order
+        /// property to record date and time of an order 
         /// </summary>
         public DateTime OrderedTime { get; set; }
 
@@ -37,6 +37,7 @@ namespace StoreLibrary
 
         /// <summary>
         /// property to record total cost of an order, must set it positive
+        /// total cost should be finalized
         /// </summary>
         public double TotalCost {
             get { return totalCost; }
@@ -45,6 +46,7 @@ namespace StoreLibrary
                 {
                     throw new ArgumentException("total cost must be positive");
                 }
+                totalCost = value;
             } }
 
         private List<CProduct> productList = new List<CProduct>();
@@ -81,11 +83,12 @@ namespace StoreLibrary
         /// <summary>
         /// parameterized constructor
         /// </summary>
-        public COrder(CStore storeLocation, CCustomer customer,DateTime orderedTime,List<CProduct> productList )
+        public COrder(CStore storeLocation, CCustomer customer,DateTime orderedTime, double totalCost, List<CProduct> productList )
         {
             StoreLocation = storeLocation;
             Customer = customer;
             OrderedTime = orderedTime;
+            TotalCost = totalCost;
             ProductList = productList;
         }
 
