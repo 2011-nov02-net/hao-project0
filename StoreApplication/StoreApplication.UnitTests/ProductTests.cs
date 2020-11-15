@@ -6,13 +6,18 @@ using Xunit;
 
 namespace StoreApplication.UnitTests
 {
-   
+    /// <summary>
+    /// unit test cases for console product class
+    /// </summary>
     public class ProductTests
     {
+        /// <summary>
+        /// testing its constructor
+        /// </summary>
         [Fact]
         public void CreateAProduct()
         {
-            Product p = new Product("111","Banana","Produce",0.5,10);
+            CProduct p = new CProduct("111","Banana","Produce",0.5,10);
             Assert.Equal("111",p.UniqueID);
             Assert.Equal("Banana", p.Name);
             Assert.Equal("Produce", p.Category);

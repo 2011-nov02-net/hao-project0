@@ -23,14 +23,14 @@ namespace StoreApplication
                 // read from databse
                 string path = "../../../SimplyWriteData.json";
                 JsonFilePersist persist = new JsonFilePersist(path);
-                Store store = persist.ReadStoreData();
+                CStore store = persist.ReadStoreData();
 
                 Console.WriteLine("1.Add a new customer\n  2.Process an order\n  3.Restock\n  4.Search in database\n  5.Display order details\n ");
                 // extra validation
                 int choice = Console.Read();
                 if (choice == 1)
                 {
-                    Customer newCustomer = CustomerSetup(store);
+                    CCustomer newCustomer = CustomerSetup(store);
                     // Console.WriteLine("What is the customer's default store?");
                     // future implementation, search a location with unique branchID/address
                     // string branchID = Console.ReadLine();
@@ -40,16 +40,16 @@ namespace StoreApplication
                 else if (choice == 2)
                 {
                     // in order to add an order, first find a customer
-                    Customer customer = CustomerSetup(store);
-                    List<IProduct> productList = ProductsSetup();
+                    CCustomer customer = CustomerSetup(store);
+                    List<CProduct> productList = ProductsSetup();
                     // location, customer, orderedtime, productList
                     // create an order
                     // exception handling here
                     bool isSuccessful = false;
-                    Order newOrder = new Order();
+                    COrder newOrder = new COrder();
                     try
                     {
-                        newOrder = new Order(store, customer, DateTime.Now, productList);
+                        newOrder = new COrder(store, customer, DateTime.Now, productList);
                         isSuccessful = true;
                         Console.WriteLine("Order placed successfully!");
                     }
@@ -73,7 +73,7 @@ namespace StoreApplication
 
                 else if (choice == 3)
                 {
-                    List<IProduct> supply = ProductsSetup();
+                    List<CProduct> supply = ProductsSetup();
                     // same process to key in product details in a loop                    
                     store.AddProducts(supply);
                 }
@@ -93,7 +93,7 @@ namespace StoreApplication
         }
 
 
-        private static Customer CustomerSetup(Store store)
+        private static CCustomer CustomerSetup(CStore store)
         {
             Console.WriteLine("What is the customer's SSN?");
 
@@ -105,14 +105,14 @@ namespace StoreApplication
             Console.WriteLine("What is the customer's phone?");
             // extra validation on format, regular expression
             string phone = Console.ReadLine();
-            Customer newCustomer = new Customer(social, first, last, phone, store);
+            CCustomer newCustomer = new CCustomer(social, first, last, phone, store);
             return newCustomer;
         }
 
 
-        private static List<IProduct> ProductsSetup()
+        private static List<CProduct> ProductsSetup()
         {
-            List<IProduct> productList = new List<IProduct>();
+            List<CProduct> productList = new List<CProduct>();
             Console.WriteLine("Enter 'x' to exit");
             string init = Console.ReadLine();
             while (init != "x")

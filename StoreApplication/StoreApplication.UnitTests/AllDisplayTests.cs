@@ -7,39 +7,49 @@ using Xunit;
 
 namespace StoreApplication.UnitTests
 {
+    /// <summary>
+    /// unit test cases for all display related classes
+    /// </summary>
     public class AllDisplayTests
     {
+        /// <summary>
+        /// testing the ability to simple display an order
+        /// </summary>
+        /// 
         // move codes here to Main program for testing
         [Fact]
         public void DisplayOneOrderPrintOnConsole()
         {
             IDisplay dis = new SimpleDisplay();
-            List<IProduct> supply = new List<IProduct>
-            { new Product("111","Banana","Produce",0.5,10),
-              new Product("222","orange","Produce",0.88,10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 4),
-                                                    new Product("222", "orange", "Produce", 0.88, 4)};
-            Store store = new Store("Phoenix101", supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            Order order = new Order(store, customer, DateTime.Today, p);
+            List<CProduct> supply = new List<CProduct>
+            { new CProduct("111","Banana","Produce",0.5,10),
+              new CProduct("222","orange","Produce",0.88,10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 4)};
+            CStore store = new CStore("Phoenix101", supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            COrder order = new COrder(store, customer, DateTime.Today, p);
             dis.DisplayOneOrder(order);
             Assert.True(true);
         }
 
+        /// <summary>
+        /// testing the ability to simple display multiple orders
+        /// </summary>
         [Fact]
         public void DisplayAllOrdersPrintOnConsole()
         {
             IDisplay dis = new SimpleDisplay();
-            List<IProduct> supply = new List<IProduct>
-            { new Product("111","Banana","Produce",0.5,10),
-              new Product("222","orange","Produce",0.88,10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 4),
-                                                    new Product("222", "orange", "Produce", 0.88, 4)};
-            Store store = new Store("Phoenix101", supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            List<Order> orders = new List<Order>
-            {  new Order(store, customer, DateTime.Today, p),
-                new Order(store, customer, DateTime.Today, p) };                
+            List<CProduct> supply = new List<CProduct>
+            { new CProduct("111","Banana","Produce",0.5,10),
+              new CProduct("222","orange","Produce",0.88,10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 4)};
+            CStore store = new CStore("Phoenix101", supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            List<COrder> orders = new List<COrder>
+            {  new COrder(store, customer, DateTime.Today, p),
+                new COrder(store, customer, DateTime.Today, p) };                
             dis.DisplayAllOrder(orders);
             Assert.True(true);
         }

@@ -6,11 +6,14 @@ using System.Text;
 
 namespace StoreApplication.Display
 {
+    /// <summary>
+    /// display interface that maps out multiple display functions
+    /// </summary>
     public interface IDisplay
     {
-        void DisplayOneOrder(Order order);
+        void DisplayOneOrder(COrder order);
 
         // for store and customer
-        void DisplayAllOrder(List<Order> orders);
+        void DisplayAllOrder(List<COrder> orders);
     }
 }

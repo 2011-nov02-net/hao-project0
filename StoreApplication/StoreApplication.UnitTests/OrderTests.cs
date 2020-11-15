@@ -6,21 +6,27 @@ using Xunit;
 
 namespace StoreApplication.UnitTests
 {
+    /// <summary>
+    /// unit test cases for console order class
+    /// </summary>
     public class OrderTests
     {
+        /// <summary>
+        /// testing its constructor
+        /// </summary>
         [Fact]
         public void CreateAOrder()
         {
             
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10) };
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 4),
-                                                    new Product("222", "orange", "Produce", 0.88, 4)};
-            Store store = new Store("Phoenix101",supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);         
-            Order order = new Order(store, customer, DateTime.Today, p);
-            Assert.Equal("Phoenix101", order.StoreLocation.BranchID);
-            Assert.Equal("123123121", order.Customer.Social);
+            List<CProduct> supply = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 10),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 10) };
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 4)};
+            CStore store = new CStore("Phoenix101",supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);         
+            COrder order = new COrder(store, customer, DateTime.Today, p);
+            Assert.Equal("Phoenix101", order.StoreLocation.Storeloc);
+            Assert.Equal("123123121", order.Customer.Customerid);
             Assert.Equal(DateTime.Today, order.OrderedTime);
             Assert.Equal(p,order.ProductList);
         }

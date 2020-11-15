@@ -9,15 +9,26 @@ using System.Text;
 
 namespace StoreLibrary
 {
+    /// <summary>
+    /// persistent file handling
+    /// </summary>
     public class JsonFilePersist
     {
         private readonly string path;
+        /// <summary>
+        /// default constructor
+        /// </summary>
+        /// <param name="cpath"></param>
         public JsonFilePersist(string cpath)
         {
             path = cpath;
         }
       
-        public void WriteStoreData(Store data)
+        /// <summary>
+        /// behavior to serialize and write data
+        /// </summary>
+        /// <param name="data"></param>
+        public void WriteStoreData(CStore data)
         {
             JsonSerializer serializer = new JsonSerializer();
             serializer.Converters.Add(new Newtonsoft.Json.Converters.IsoDateTimeConverter());
@@ -27,16 +38,22 @@ namespace StoreLibrary
             using (StreamWriter sw = new StreamWriter(path))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                serializer.Serialize(writer, data, typeof(Store));
+                serializer.Serialize(writer, data, typeof(CStore));
             }   
             /*
             string json = JsonConvert.SerializeObject(data);
             File.WriteAllText(path,json);
             */         
         }
-        public Store ReadStoreData()
+
+        /// <summary>
+        /// behavior to read data and deserialize
+        /// have jsonignore on console order class to avoid object cycle
+        /// </summary>
+        /// <returns></returns>
+        public CStore ReadStoreData()
         {
-            Store data;
+            CStore data;
             try
             {
                 
@@ -46,7 +63,7 @@ namespace StoreLibrary
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Converters.Add(new Newtonsoft.Json.Converters.JavaScriptDateTimeConverter());
                 */
-                data = JsonConvert.DeserializeObject<Store>(json, new JsonSerializerSettings
+                data = JsonConvert.DeserializeObject<CStore>(json, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
                     NullValueHandling = NullValueHandling.Ignore,
@@ -54,7 +71,7 @@ namespace StoreLibrary
             }
             catch (FileNotFoundException e)
             {
-                return new Store();
+                return new CStore();
             }
             return data;
         }

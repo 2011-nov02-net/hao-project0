@@ -6,31 +6,39 @@ using Xunit;
 
 namespace StoreApplication.UnitTests
 {
+    /// <summary>
+    /// unit test cases for console customer class
+    /// </summary>
     public class CustomerTests
     {
-
+        /// <summary>
+        /// testing its constructor
+        /// </summary>
         [Fact]
         public void CreateACustomer()
         {
-            Store store = new Store("Phoenix101");
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            Assert.Equal("123123121", customer.Social);
+            CStore store = new CStore("Phoenix101");
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            Assert.Equal("123123121", customer.Customerid);
             Assert.Equal("John", customer.FirstName);
             Assert.Equal("Smith", customer.LastName);
             Assert.Equal("6021111111", customer.PhoneNumber);
             Assert.Equal(store, customer.DefaultLocation);
         }    
 
+        /// <summary>
+        /// testing the scenario when a customer placed an order successfully
+        /// </summary>
         [Fact]
         public void CustomerPlacedASuccessfulOrder()
         {
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 4),
-                                                    new Product("222", "orange", "Produce", 0.88, 4)};
-            Store store = new Store("Phoenix101",supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            Order order = new Order(store, customer, DateTime.Today, p);
+            List<CProduct> supply = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 10),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 4),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 4)};
+            CStore store = new CStore("Phoenix101",supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            COrder order = new COrder(store, customer, DateTime.Today, p);
             customer.PlaceOrder(store, order);
             // inventory should be updated 10-4=6
             foreach (var item in store.Inventory)
@@ -39,16 +47,19 @@ namespace StoreApplication.UnitTests
             }
         }
 
+        /// <summary>
+        /// testing the scenario when a guest failed to place an order
+        /// </summary>
         [Fact]
         public void CustomerWithoutProfileFailedToPlaceAnOrder()
         {
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 20),
-                                                    new Product("222", "orange", "Produce", 0.88, 20)};
-            Store store = new Store("Phoenix101", supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            Order order = new Order(store, customer, DateTime.Today, p);
+            List<CProduct> supply = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 10),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 20),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 20)};
+            CStore store = new CStore("Phoenix101", supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            COrder order = new COrder(store, customer, DateTime.Today, p);
             customer.PlaceOrder(store, order);
 
             // inventory should not be updated 10-20<0 => 10
@@ -64,16 +75,19 @@ namespace StoreApplication.UnitTests
             Assert.Empty(store.CustomerDict);
         }
 
+        /// <summary>
+        /// testing the scenario when a customer failed to place an order
+        /// </summary>
         [Fact]
         public void CustomerWithProfileFailedToPlaceAnOrder()
         {
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 20),
-                                                    new Product("222", "orange", "Produce", 0.88, 20)};
-            Store store = new Store("Phoenix101", supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
-            Order order = new Order(store, customer, DateTime.Today, p);
+            List<CProduct> supply = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 10),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 20),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 20)};
+            CStore store = new CStore("Phoenix101", supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
+            COrder order = new COrder(store, customer, DateTime.Today, p);
             // customer has an existing profile
             store.AddCustomer(customer);
             customer.PlaceOrder(store, order);
@@ -88,18 +102,21 @@ namespace StoreApplication.UnitTests
             Assert.Empty(store.CustomerDict["123123121"].OrderHistory);
         }
 
+        /// <summary>
+        /// testing the scenario when a customer purchased too many products than allowed
+        /// </summary>
         [Fact]
         public void CustomerPurchasedTooMany()
         {
-            List<IProduct> supply = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 10),
-                                                    new Product("222", "orange", "Produce", 0.88, 10)};
-            List<IProduct> p = new List<IProduct> { new Product("111", "Banana", "Produce", 0.5, 2000),
-                                                    new Product("222", "orange", "Produce", 0.88, 2000)};
-            Store store = new Store("Phoenix101", supply);
-            Customer customer = new Customer("123123121", "John", "Smith", "6021111111", store);
+            List<CProduct> supply = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 10),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 10)};
+            List<CProduct> p = new List<CProduct> { new CProduct("111", "Banana", "Produce", 0.5, 2000),
+                                                    new CProduct("222", "orange", "Produce", 0.88, 2000)};
+            CStore store = new CStore("Phoenix101", supply);
+            CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111", store);
             try
             {
-                Order order = new Order(store, customer, DateTime.Today, p);
+                COrder order = new COrder(store, customer, DateTime.Today, p);
             }
             catch (ArgumentException e)
             {
