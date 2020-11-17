@@ -42,6 +42,22 @@ namespace StoreLibrary
         public CCustomer()
         { }
 
+        //
+        public CCustomer(string firstName, string lastName)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+
+        }
+
+        //
+        public CCustomer(string firstName, string lastName, string phoneNumber)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            PhoneNumber = phoneNumber;
+        }
+
         /// <summary>
         /// parameterized constructor
         /// </summary>

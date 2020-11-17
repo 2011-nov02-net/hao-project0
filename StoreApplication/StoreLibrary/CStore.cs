@@ -36,6 +36,7 @@ namespace StoreLibrary
         /// default constructor
         /// </summary>
         public CStore() { }
+    
 
         /// <summary>
         /// parameterized constructor
@@ -44,16 +45,34 @@ namespace StoreLibrary
             Storeloc = storeloc;
         }
 
+        public CStore(string storeLoc, string storePhone)
+        {
+            Storeloc = storeLoc;
+            Storephone = storePhone;
+        }
+
         /// <summary>
         /// parameterized constructor to have a store start with inventory
         /// </summary>
-        public CStore(string storeloc, List<CProduct> supply)
+        public CStore(string storeloc, string storePhone, List<CProduct> supply)
         {
-            Storeloc = storeloc;  
+            Storeloc = storeloc;
+            Storephone = storePhone;
             foreach (var product in supply)
             {              
                 Inventory[product.UniqueID] = product;
             }          
+        }
+
+        //
+        public double CalculateTotalPrice(List<CProduct> productList)
+        {
+            double total = 0;
+            foreach (var product in productList)
+            {
+                total = total + product.Price * product.Quantity;
+            }
+            return total;
         }
 
         /// <summary>
@@ -82,17 +101,17 @@ namespace StoreLibrary
         public void AddCustomer(CCustomer customer)
         {
             // create new profile
-            string social = customer.Customerid;
+            string customerid = customer.Customerid;
 
             CCustomer tempo; 
-            if (CustomerDict.TryGetValue(social, out tempo))
+            if (CustomerDict.TryGetValue(customerid, out tempo))
             {
                 // already exist, no need to add 
             }
             else
             {
                 // not found, create a new customer profile
-                CustomerDict[social] = customer;
+                CustomerDict[customerid] = customer;
             }          
         }
 
@@ -107,17 +126,17 @@ namespace StoreLibrary
             {
                 UpdateInventory(order);
                 // need to change
-                string social = order.Customer.Customerid;
+                string customerid = order.Customer.Customerid;
                 // update customer's list of order after it has been accepted
                 CCustomer tempo;
-                if (CustomerDict.TryGetValue(social, out tempo))
+                if (CustomerDict.TryGetValue(customerid, out tempo))
                 {
-                    CustomerDict[social].OrderHistory.Add(order);                    
+                    CustomerDict[customerid].OrderHistory.Add(order);                    
                 }
                 else
                 {
-                    CustomerDict[social] = order.Customer;
-                    CustomerDict[social].OrderHistory.Add(order);
+                    CustomerDict[customerid] = order.Customer;
+                    CustomerDict[customerid].OrderHistory.Add(order);
                 }            
             }   
         }
@@ -172,5 +191,57 @@ namespace StoreLibrary
             }
             return true;
         }
+
+
+        // overload methods to work with list of products directly
+
+        // directly working with list of products
+        public bool CheckInventory(List<CProduct> productList )
+        {
+            foreach (var purchasedProduct in productList)
+            {
+                // because of reference types, same objects may not be considered the same
+                // try string literals
+                string uniqueID = purchasedProduct.UniqueID;
+                CProduct storage;
+                // find the product in the store inventory
+                if (Inventory.TryGetValue(uniqueID, out storage))
+                {
+                    // found
+                    // but not enough 
+                    if (storage.Quantity < purchasedProduct.Quantity)
+                    {
+                        return false;
+                    }
+                    // enough
+                    else
+                    {
+                        // one product's quantity has qualified
+                    }
+                }
+                else
+                {
+                    // not found
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        public void UpdateInventory(List<CProduct> productList)
+        {
+            // double checking just in case this method is called independently
+            if (CheckInventory(productList))
+            {
+                foreach (var purchasedProduct in productList)
+                {
+                    // update inventory
+                    Inventory[purchasedProduct.UniqueID].Quantity -= purchasedProduct.Quantity;
+                }
+            }
+        }
+
+        //
     }
 }

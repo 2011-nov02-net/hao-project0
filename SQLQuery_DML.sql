@@ -40,9 +40,15 @@ insert into orderr(orderid,storeloc,customerid,totalcost) values('o004','River V
 -- processid is auto generated
 -- quantity
 insert into orderproduct(orderid,productid,quantity) values('o001','p101',1);
+-- debugging row
+insert into orderproduct(orderid,productid,quantity) values('o001','p101',10);
 insert into orderproduct(orderid,productid,quantity) values('o002','p102',2);
 insert into orderproduct(orderid,productid,quantity) values('o003','p103',3);
 insert into orderproduct(orderid,productid,quantity) values('o004','p104',4);
+-- debugging row
+insert into orderproduct(orderid,productid,quantity) values('o001','p101',9);
+
+
 
 
 

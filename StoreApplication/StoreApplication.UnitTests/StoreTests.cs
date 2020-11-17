@@ -20,7 +20,7 @@ namespace StoreApplication.UnitTests
             List<CProduct> supply = new List<CProduct>
             { new CProduct("111","Banana","Produce",0.5,10), new CProduct("222","orange","Produce",0.88,10)
             };
-            CStore store = new CStore("Phoenix101",supply);
+            CStore store = new CStore("Phoenix101", "606", supply);
 
             Assert.Equal("Phoenix101", store.Storeloc );
             foreach (var product in supply)
@@ -40,7 +40,7 @@ namespace StoreApplication.UnitTests
             { new CProduct("111","Banana","Produce",0.5,10),
               new CProduct("222","orange","Produce",0.88,10)};
 
-            CStore store = new CStore("Phoenix101", supply);
+            CStore store = new CStore("Phoenix101", "606", supply);
             CCustomer customer = new CCustomer("123123121", "John", "Smith", "6021111111");
             store.AddCustomer(customer);
             foreach (var pair in store.CustomerDict)
