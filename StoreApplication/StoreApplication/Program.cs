@@ -269,39 +269,17 @@ namespace StoreApplication
 
             
             string storeLoc = "Central Ave 1";
-            string firstName = "Cili";
-            string lastName = "Cili";
-            string phoneNumber = "9977777777";
+            string firstName = "Dili";
+            string lastName = "Dili";
+            string phoneNumber = "6025667777";
             List<CProduct> productList = new List<CProduct>(){
-                new CProduct("p102","regular coke","drink",1,4),
-                new CProduct("p103","pizza","frozen food",1,4),
-                new CProduct("p104","milk","diary",1,4),
+                new CProduct("p102","regular coke","drink",1,1),
+                new CProduct("p103","pizza","frozen food",1,1),
+                new CProduct("p104","milk","diary",1,1),
 
             };
             repo.CustomerPlaceAnOrder(storeLoc, firstName, lastName, phoneNumber, productList);
             
-
-
-            /*
-            IEnumerable<CProduct> p0 = repo.GetAllProducts();
-            foreach (var product in p0)
-            {
-                Console.WriteLine($"id {product.UniqueID}\t name {product.Name}\t category {product.Category}\t price {product.Price}\t quantity {product.Quantity}");
-            }
-            */
-
-            /*
-            CProduct p1 = repo.GetFirstProductById("p101");
-            Console.WriteLine($"id {p1.UniqueID}\t name {p1.Name}\t category {p1.Category}\t price {p1.Price}\t quantity {p1.Quantity}");
-            */
-            /*
-            List<CProduct> p2 = repo.GetAllProductsById("p101");
-            foreach (var product in p2)
-            {
-                Console.WriteLine($"id {product.UniqueID}\t name {product.Name}\t category {product.Category}\t price {product.Price}\t quantity {product.Quantity}");
-            }
-            */
-
 
         }
     }
