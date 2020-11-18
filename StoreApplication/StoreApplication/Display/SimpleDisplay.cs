@@ -1,4 +1,5 @@
-﻿using StoreLibrary;
+﻿using StoreDatamodel;
+using StoreLibrary;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +39,16 @@ namespace StoreApplication.Display
            
         }
 
-        
+        public void DisplayOneOrder(Orderr dbOrders)
+        {
+            Console.WriteLine($"Orderred at: {dbOrders.Storeloc} customerid: {dbOrders.Customerid} time: {dbOrders.Orderedtime}");
+            foreach (var product in dbOrders.Orderproducts)
+            {
+                Console.WriteLine($"ID: {product.Product.Productid}, Name: {product.Product.Name}, Price: {product.Product.Price}, Quantity: {product.Quantity}");
+            }
+        }
+
+
+
     }
 }

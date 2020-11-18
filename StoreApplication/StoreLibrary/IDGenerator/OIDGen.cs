@@ -6,17 +6,36 @@ namespace StoreLibrary.IDGenerator
 {
     public static class OIDGen
     {
-        private static int count = 888;
+        
 
         public static string Gen()
         {
-            count++;
-            return "Order" + count;
+            string path = "../../../OID.txt";
+            JsonFilePersist persist = new JsonFilePersist(path);
+            string data = persist.ReadStoreData();
+            int number = int.Parse(data);
+            number = number + 1;
+            string id = number.ToString();
+            persist.WriteStoreData(id);
+            string orderid = "order " + id;
+            return orderid;
         }
 
         public static string Get()
         {
-            return "Order" + count;
+            string path = "../../../OID.txt";
+            JsonFilePersist persist = new JsonFilePersist(path);
+            string id = persist.ReadStoreData();         
+            string orderid = "Order " + id ; 
+            return orderid;
         }
+
+
+        /*
+            string json = JsonConvert.SerializeObject(data);
+            File.WriteAllText(path,json);
+            */
+
+
     }
 }

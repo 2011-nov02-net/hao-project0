@@ -29,39 +29,66 @@ namespace StoreApplication
             optionsBuilder.LogTo(logStream.WriteLine, LogLevel.Debug);
             s_dbContextOptions = optionsBuilder.Options;
 
-            TestEF();
-           
-            /*
+            StoreRepository repo = new StoreRepository(s_dbContextOptions);
+            SimpleDisplay sd = new SimpleDisplay();
+    
             // enter and exit
             Console.WriteLine("Welcome to XYZ Enterprise, enter any key to continue, 'x' to exit");
 
             // all inputs have a validation method to process Ivalid inputs
             // to do
-            string init = Console.ReadLine();
-            while (init != "x")
+            string choice = Console.ReadLine();
+            while (choice != "x")
             {
                 // read from databse
-                string path = "../../../SimplyWriteData.json";
-                JsonFilePersist persist = new JsonFilePersist(path);
-                CStore store = persist.ReadStoreData();
+                // string path = "../../../SimplyWriteData.json";
+                // JsonFilePersist persist = new JsonFilePersist(path);
+                // CStore store = persist.ReadStoreData();
 
-                Console.WriteLine("Choose one of the following operations:\n 1.Add a new customer\n  2.Process an order\n  3.Restock\n  4.Search in database\n  5.Display order detail\n ");
+                Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search in database\n  4.Display an order\n ");
                 // extra validation
 
-                int choice = Console.Read();
-                if (choice == 1)
+                choice = Console.ReadLine();
+                if (choice == "1")
                 {
-                    CCustomer newCustomer = CustomerSetup(store);                                        
-                    store.AddCustomer(newCustomer);
-                }
-                else if (choice == 2)
-                {
+                    Console.WriteLine("What is the store location?");
+                    string storeLoc = Console.ReadLine();
+
                     Console.WriteLine("What is the customer's first name?");
                     string firstname = Console.ReadLine();
                     Console.WriteLine("What is the customer's last name?");
                     string lastname = Console.ReadLine();
+                    Console.WriteLine("What is the customer's phone?");
+                    string phone = Console.ReadLine();
+                    repo.StoreAddACusomter(storeLoc, firstname, lastname, phone);
 
-                    ISearch ss = new SimpleSearch();
+                    //CCustomer newCustomer = CustomerSetup(store);                                        
+                    //store.AddCustomer(newCustomer);
+                }
+                else if (choice == "2")
+                {
+                    Console.WriteLine("What is the store location?");
+                    string storeLoc = Console.ReadLine();
+
+                    Console.WriteLine("What is the customer's first name?");
+                    string firstname = Console.ReadLine();
+                    Console.WriteLine("What is the customer's last name?");
+                    string lastname = Console.ReadLine();
+                    Console.WriteLine("What is the customer's phone?");
+                    string phone = Console.ReadLine();
+
+                    List<CProduct> productList = ProductsSetup();
+                    bool isSuccessful = repo.CustomerPlaceAnOrder(storeLoc, firstname, lastname, phone, productList);
+                    if (isSuccessful)
+                    {
+                        Console.WriteLine("Order placed successful");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Order failed");
+                    }
+                    /*
+                    //ISearch ss = new SimpleSearch();
                     // empty string if not found
                     string customerid;
                     bool found = ss.SearchByName(store, firstname, lastname,out customerid);
@@ -74,7 +101,9 @@ namespace StoreApplication
                         
                     }
                     else { customer = store.CustomerDict[customerid]; }
-                    
+                    */
+
+                    /*
                     // products here
                     // probably need another while loop if an order failed
                     List<CProduct> productList = ProductsSetup();               
@@ -110,23 +139,27 @@ namespace StoreApplication
                         {
                             Console.WriteLine("Not enough quantity to fullfill");
                         }
-                    }                
+                    }
+                    */
                 }
 
-                else if (choice == 3)
+                else if (choice == "3")
                 {
-                    List<CProduct> supply = ProductsSetup();                                      
-                    store.AddProducts(supply);
-                }
+                    Console.WriteLine("Enter the store location");
+                    string storeLoc = Console.ReadLine();
 
-                else if (choice == 4)
-                {
-                    // refactor this portion into a method
                     Console.WriteLine("Enter Customer's first name");
                     string firstname = Console.ReadLine();
                     Console.WriteLine("Enter Customer's last name");
-                    string lastname = Console.ReadLine();
 
+                    string lastname = Console.ReadLine();
+                    string CID;
+                    bool found = repo.CustomerSearch(storeLoc, firstname, lastname,out CID);
+                    if (found)
+                        Console.WriteLine($"CustomerID: {CID} found, customer alreay exist in the database");
+                    else
+                        Console.WriteLine("Customer not found, proceed to option 1 to create a new profile");
+                    /*
                     SimpleSearch ss = new SimpleSearch();
                     // empty string if not found
                     string customerid;
@@ -136,10 +169,16 @@ namespace StoreApplication
                         Console.WriteLine("customer profile does not exist");
                     }
                     else { Console.WriteLine("customer profile found"); }
-
+                    */
                 }
-                else if (choice == 5)
+                else if (choice == "4")
                 {
+                    Console.WriteLine("What is the orderid?");
+                    string orderid = Console.ReadLine();
+                    sd.DisplayOneOrder(repo.FindAnOrder(orderid));
+                }
+
+                    /*
                     IDisplay sd = new SimpleDisplay();
                     Console.WriteLine("1 Display an order\t 2 Display all orders of a customer\t 3 Display all orders of the store");
                     int input = Console.Read();
@@ -172,16 +211,12 @@ namespace StoreApplication
                             sd.DisplayAllOrders(pair.Value.OrderHistory);
                         }
                     }
-            
-                }
-            
-            
-
-            } */
+                    */ 
+            } 
         }
 
         
-
+        /*
         private static CCustomer CustomerSetup(CStore store)
         {
             Console.WriteLine("What is the customer id?");
@@ -196,13 +231,15 @@ namespace StoreApplication
             CCustomer newCustomer = new CCustomer(customerid, firstname, lastname, phone);
             return newCustomer;
         }
+        */
 
 
         private static List<CProduct> ProductsSetup()
         {
             List<CProduct> productList = new List<CProduct>();
-            Console.WriteLine("Enter 'x' to exit");
+            Console.WriteLine("Setting up products, enter any key to continue, enter 'x' to exit");
             string init = Console.ReadLine();
+            bool hasNext = true;
             while (init != "x")
             {
                 Console.WriteLine("Enter Product unique ID");
@@ -217,18 +254,22 @@ namespace StoreApplication
                 Console.WriteLine("Enter Product price");
                 string priceStr = Console.ReadLine();
                 double price;
-                Double.TryParse(priceStr,out price);
+                Double.TryParse(priceStr, out price);
 
                 Console.WriteLine("Enter Product quantity");
                 string quantityStr = Console.ReadLine();
                 int quantity;
                 int.TryParse(quantityStr, out quantity);
+
                 CProduct p = new CProduct(id, name, category, price, quantity);
                 productList.Add(p);
+
+                Console.WriteLine("Press x to end");
+                init = Console.ReadLine();
+
             }
+
             return productList;
-
-
 
         }
 
@@ -249,38 +290,7 @@ namespace StoreApplication
 
             string connectionString = JsonSerializer.Deserialize<string>(json);
             return connectionString;
-        }
-
-
-        static void TestEF()
-        {
-            
-            StoreRepository repo = new StoreRepository(s_dbContextOptions);
-            //
-            SimpleDisplay sd = new SimpleDisplay();
-            
-            /*
-            string storeLoc = "Central Ave 1";
-            string firstName = "Chelsea";
-            string lastName = "Mord";
-            string phoneNumber = "6061222211";
-            repo.StoreAddACusomter(storeLoc,firstName,lastName,phoneNumber);
-            */
-
-            
-            string storeLoc = "Central Ave 1";
-            string firstName = "Dili";
-            string lastName = "Dili";
-            string phoneNumber = "6025667777";
-            List<CProduct> productList = new List<CProduct>(){
-                new CProduct("p102","regular coke","drink",1,1),
-                new CProduct("p103","pizza","frozen food",1,1),
-                new CProduct("p104","milk","diary",1,1),
-
-            };
-            repo.CustomerPlaceAnOrder(storeLoc, firstName, lastName, phoneNumber, productList);
-            
-
-        }
+        }     
     }
 }
+

@@ -14,7 +14,7 @@ namespace StoreApplication.UnitTests
     {
         /// <summary>
         /// testing the ability to simply write data
-        /// </summary>
+        /// </summary>     
         [Fact]
         public void SimplyWriteData()
         {
@@ -75,7 +75,6 @@ namespace StoreApplication.UnitTests
             foreach (var pair in store.Inventory)
             {
                 Assert.Equal(15, pair.Value.Quantity);
-
             }
         }
  

@@ -6,17 +6,26 @@ namespace StoreLibrary.IDGenerator
 {
     public static class CIDGen
     {
-        private static int count = 888;
-
         public static string Gen()
         {
-            count++;
-            return "Customer" + count;
+            string path = "../../../CID.txt";
+            JsonFilePersist persist = new JsonFilePersist(path);
+            string data = persist.ReadStoreData();
+            int number = int.Parse(data);
+            number = number + 1;
+            string id = number.ToString();
+            persist.WriteStoreData(id);
+            string customerid = "customer " + id;
+            return customerid;
         }
 
         public static string Get()
         {
-            return "Customer" + count;
+            string path = "../../../CID.txt";
+            JsonFilePersist persist = new JsonFilePersist(path);
+            string id = persist.ReadStoreData();
+            string customerid = "customer " + id;
+            return customerid;
         }
     }
 }
