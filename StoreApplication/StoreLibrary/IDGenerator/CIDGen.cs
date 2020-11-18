@@ -10,11 +10,11 @@ namespace StoreLibrary.IDGenerator
         {
             string path = "../../../CID.txt";
             JsonFilePersist persist = new JsonFilePersist(path);
-            string data = persist.ReadStoreData();
+            string data = persist.ReadText();
             int number = int.Parse(data);
             number = number + 1;
             string id = number.ToString();
-            persist.WriteStoreData(id);
+            persist.WriteText(id);
             string customerid = "customer " + id;
             return customerid;
         }
@@ -23,7 +23,7 @@ namespace StoreLibrary.IDGenerator
         {
             string path = "../../../CID.txt";
             JsonFilePersist persist = new JsonFilePersist(path);
-            string id = persist.ReadStoreData();
+            string id = persist.ReadText();
             string customerid = "customer " + id;
             return customerid;
         }

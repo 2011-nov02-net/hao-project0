@@ -12,11 +12,11 @@ namespace StoreLibrary.IDGenerator
         {
             string path = "../../../OID.txt";
             JsonFilePersist persist = new JsonFilePersist(path);
-            string data = persist.ReadStoreData();
+            string data = persist.ReadText();
             int number = int.Parse(data);
             number = number + 1;
             string id = number.ToString();
-            persist.WriteStoreData(id);
+            persist.WriteText(id);
             string orderid = "order " + id;
             return orderid;
         }
@@ -25,17 +25,9 @@ namespace StoreLibrary.IDGenerator
         {
             string path = "../../../OID.txt";
             JsonFilePersist persist = new JsonFilePersist(path);
-            string id = persist.ReadStoreData();         
+            string id = persist.ReadText();         
             string orderid = "Order " + id ; 
             return orderid;
         }
-
-
-        /*
-            string json = JsonConvert.SerializeObject(data);
-            File.WriteAllText(path,json);
-            */
-
-
     }
 }

@@ -78,7 +78,6 @@ namespace StoreLibrary
             CStore data;
             try
             {
-
                 string json = File.ReadAllText(path);
                 /*
                 // object cycle
