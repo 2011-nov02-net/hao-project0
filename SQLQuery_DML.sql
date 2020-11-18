@@ -54,6 +54,10 @@ insert into orderproduct(orderid,productid,quantity) values('o001','p101',9);
 
 -- insert bridges store - product
 insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p101',10);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p102',10);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p103',10);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p104',10);
+
 insert into Inventory(storeloc,productid,quantity) values('South Ave 2', 'p102',10);
 insert into Inventory(storeloc,productid,quantity) values('Mountain View 3', 'p103',10);
 insert into Inventory(storeloc,productid,quantity) values('River View 4', 'p104',10);
@@ -64,6 +68,7 @@ insert into storecustomer(storeloc,customerid) values('South Ave 2','cus2');
 insert into storecustomer(storeloc,customerid) values('Mountain View 3','cus3');
 insert into storecustomer(storeloc,customerid) values('River View 4','cus4');
 
+--
 select* from product;
 select* from orderr;
 select* from customer;

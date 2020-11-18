@@ -78,6 +78,7 @@ namespace StoreDatamodel
                 CCustomer conCustomer = new CCustomer(cust.Customer.Firstname, cust.Customer.Lastname,cust.Customer.Phonenumber);
                 conStore.CustomerDict[cust.Customerid] = conCustomer;
             }
+           
 
             // store with a skeleton customer profile loaded
             // move to business logic
@@ -90,6 +91,7 @@ namespace StoreDatamodel
             if (found)
             {
                 // already a customer, no need to add
+                Console.Write("already in");
             }
             else
             {               
@@ -101,8 +103,8 @@ namespace StoreDatamodel
                     Lastname = lastName,
                     Phonenumber = phoneNumber
                 };
-                context.Customers.Add(newCustomer);  
-                
+                context.Customers.Add(newCustomer);
+                Console.WriteLine("just added a new customer");
                 // end
                 context.SaveChanges();
 
@@ -143,6 +145,7 @@ namespace StoreDatamodel
                                                  .ThenInclude(x => x.Inventories)
                                                    .First(x => x.Storeloc == storeLoc);
             var conStore = new CStore(dbStore.Storeloc, dbStore.Storephone);
+            Console.WriteLine("store created");
 
             // create inventory
             List<CProduct> supply = new List<CProduct>();
@@ -157,6 +160,8 @@ namespace StoreDatamodel
             // function to consolidate same products
             // dictionary "productid":product(contains quantity)
             conStore.AddProducts(supply);
+            Console.WriteLine("inventory created");
+
 
             // check customer's quantity against inventory quantity
             bool isEnough = conStore.CheckInventory(productList);
@@ -167,23 +172,11 @@ namespace StoreDatamodel
                 // pull parts out
                 // give customer options to choose to become members or not
                 // refactor
+                Console.WriteLine("about to add a customer");
                 customerid = StoreAddACusomter(storeLoc, firstName, lastName, phoneNumber);
                 // Customer table and Storecustomer table updated
 
                 string orderid = OIDGen.Gen();
-                // update Orderproduct  
-                foreach (var product in productList)
-                {
-                    var newOP = new Orderproduct
-                    {
-                        Orderid = orderid,
-                        Productid = product.UniqueID,
-                        Quantity = product.Quantity
-                    };
-                    context.Orderproducts.Add(newOP);
-                }
-                context.SaveChanges();
-
                 // update order
                 double total = conStore.CalculateTotalPrice(productList);
 
@@ -197,6 +190,23 @@ namespace StoreDatamodel
                 };
                 context.Orderrs.Add(newOrder);
                 context.SaveChanges();
+                Console.WriteLine("order updated");
+
+                // update Orderproduct  
+                foreach (var product in productList)
+                {
+                    var newOP = new Orderproduct
+                    {
+                        Orderid = orderid,
+                        Productid = product.UniqueID,
+                        Quantity = product.Quantity
+                    };
+                    context.Orderproducts.Add(newOP);
+                }
+                context.SaveChanges();
+                Console.WriteLine("orderproduct updated");
+
+
                 // update inventory locally
                 conStore.UpdateInventory(productList);
                 // map updated numbers
@@ -207,13 +217,14 @@ namespace StoreDatamodel
                     product.Quantity = conStore.Inventory[product.Productid].Quantity;
                 }
                 context.SaveChanges();
+                Console.WriteLine("Inventroy updated");
 
 
 
             }
 
 
-            
+
 
         }
 

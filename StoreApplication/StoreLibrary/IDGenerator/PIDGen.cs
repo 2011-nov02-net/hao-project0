@@ -6,7 +6,7 @@ namespace StoreLibrary.IDGenerator
 {
     public static class PIDGen
     {
-        private static int count = 0;
+        private static int count = 666;
 
         public static string Gen()
         {

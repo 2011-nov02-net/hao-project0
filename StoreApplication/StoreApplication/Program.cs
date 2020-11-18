@@ -259,24 +259,27 @@ namespace StoreApplication
             //
             SimpleDisplay sd = new SimpleDisplay();
             
-            string storeLoc = "Central Ave 1";
-            string firstName = "Tesla";
-            string lastName = "Moder";
-            string phoneNumber = "6061111111";
-            repo.StoreAddACusomter(storeLoc,firstName,lastName,phoneNumber);
-
-
             /*
             string storeLoc = "Central Ave 1";
-            string firstName = "Steve";
-            string lastName = "King";
-            string phoneNumber = "7777777777";
+            string firstName = "Chelsea";
+            string lastName = "Mord";
+            string phoneNumber = "6061222211";
+            repo.StoreAddACusomter(storeLoc,firstName,lastName,phoneNumber);
+            */
+
+            
+            string storeLoc = "Central Ave 1";
+            string firstName = "Cili";
+            string lastName = "Cili";
+            string phoneNumber = "9977777777";
             List<CProduct> productList = new List<CProduct>(){
-                new CProduct("p101","diet coke","drink",1,4)
-                    
+                new CProduct("p102","regular coke","drink",1,4),
+                new CProduct("p103","pizza","frozen food",1,4),
+                new CProduct("p104","milk","diary",1,4),
+
             };
             repo.CustomerPlaceAnOrder(storeLoc, firstName, lastName, phoneNumber, productList);
-            */
+            
 
 
             /*
