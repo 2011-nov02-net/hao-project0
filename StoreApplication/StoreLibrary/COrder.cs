@@ -92,12 +92,13 @@ namespace StoreLibrary
             ProductList = productList;
         }
 
-        /*
-        public void RemoveOneProduct(CProduct product)
-        { 
-            
+        public COrder(string orderid, CStore storeLocation, CCustomer customer, DateTime orderedTime, double totalCost)
+        {
+            Orderid = orderid;
+            StoreLocation = storeLocation;
+            Customer = customer;
+            OrderedTime = orderedTime;
+            TotalCost = totalCost;
         }
-        */
-        // ca
     }
 }

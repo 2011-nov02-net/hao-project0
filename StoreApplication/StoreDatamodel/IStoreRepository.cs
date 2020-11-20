@@ -10,7 +10,7 @@ namespace StoreDatamodel
         // all get methods pull data from db and return library model objects
         CStore GetAStore(string storeLoc);
         Dictionary<string, CProduct> GetInventoryOfAStore(string storeLoc);
-        Dictionary<string, CProduct> GetAllCustomersAtOneStore(string storeLoc);
+        Dictionary<string, CCustomer> GetAllCustomersAtOneStore(string storeLoc);
         List<COrder> GetAllOrdersOfOneCustomer(string customerid);
         List<CProduct> GetAllProductsOfOneOrder(string orderid);
 

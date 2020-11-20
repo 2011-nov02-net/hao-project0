@@ -36,7 +36,7 @@ namespace StoreDatamodel
             return store;
         }
 
-        // create a dict of products that can be added to a default store
+        // create a dict of products that can be added to a given store
         public Dictionary<string, CProduct> GetInventoryOfAStore(string storeLoc)
         {
             using var context = new Project0databaseContext(_contextOptions);
@@ -51,22 +51,62 @@ namespace StoreDatamodel
                 inventory[p.UniqueID] = p;
             }
             return inventory;
-
         }
 
-        public Dictionary<string, CProduct> GetAllCustomersAtOneStore(string storeLoc)
+        // create a dictionary of customer to be added to a given store
+        public Dictionary<string, CCustomer> GetAllCustomersAtOneStore(string storeLoc)
         {
-            
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbStore = context.Stores.Include(x => x.Storecustomers)
+                                            .ThenInclude(x => x.Customer)
+                                                .First(x => x.Storeloc == storeLoc);
+            Dictionary<string, CCustomer> customers = new Dictionary<string, CCustomer>();
+            foreach (var customer in dbStore.Storecustomers)
+            {
+                CCustomer c = new CCustomer(customer.Customer.Customerid, customer.Customer.Firstname,
+                                                customer.Customer.Lastname, customer.Customer.Phonenumber);
+                // these customers have no order history atm
+                customers[c.Customerid] = c;
+            }
+            return customers;
         }
 
-        public List<COrder> GetAllOrdersOfOneCustomer(string customerid)
+        // create a list of order of a customer
+        public List<COrder> GetAllOrdersOfOneCustomer(string customerid, CStore store, CCustomer customer)
         {
-            throw new NotImplementedException();
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbCustomer = context.Customers.Include(x => x.Orderrs).First(x => x.Customerid == customerid);
+
+            List<COrder> orders = new List<COrder>();
+            foreach (var order in dbCustomer.Orderrs)
+            {
+                // total cost set to 0 for now
+                COrder o = new COrder(order.Orderid, store, customer, DateTime.Now,0);
+                orders.Add(o);
+            }
+
+            return orders;
+
         }
 
+        // create a list of an order
         public List<CProduct> GetAllProductsOfOneOrder(string orderid)
         {
-            throw new NotImplementedException();
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbOrder = context.Orderrs.Include(x => x.Orderproducts)
+                                            .ThenInclude(x => x.Product)
+                                                .First(x => x.Orderid == orderid);
+            List<CProduct> products = new List<CProduct>();
+            foreach (var product in dbOrder.Orderproducts)
+            {
+                CProduct p = new CProduct(product.Product.Productid, product.Product.Name, product.Product.Category,
+                                            product.Product.Price, product.Quantity);
+                products.Add(p);
+            }
+            return products;
+
+                                                
+
         }
 
         public void StoreAddOneCustomer(CCustomer newCustomer)
