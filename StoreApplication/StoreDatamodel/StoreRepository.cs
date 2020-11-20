@@ -71,7 +71,7 @@ namespace StoreDatamodel
             return customers;
         }
 
-        // create a list of order of a customer
+        // create a list of order for a customer
         public List<COrder> GetAllOrdersOfOneCustomer(string customerid, CStore store, CCustomer customer)
         {
             using var context = new Project0databaseContext(_contextOptions);
@@ -80,6 +80,7 @@ namespace StoreDatamodel
             List<COrder> orders = new List<COrder>();
             foreach (var order in dbCustomer.Orderrs)
             {
+                // these orders have no product list
                 // total cost set to 0 for now
                 COrder o = new COrder(order.Orderid, store, customer, DateTime.Now,0);
                 orders.Add(o);
@@ -89,7 +90,7 @@ namespace StoreDatamodel
 
         }
 
-        // create a list of an order
+        // create a list of products for an order
         public List<CProduct> GetAllProductsOfOneOrder(string orderid)
         {
             using var context = new Project0databaseContext(_contextOptions);
@@ -104,85 +105,56 @@ namespace StoreDatamodel
                 products.Add(p);
             }
             return products;
+       }
 
-                                                
-
-        }
-
-        public void StoreAddOneCustomer(CCustomer newCustomer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void CustomerPlaceOneOrder(COrder newOrder)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        // incorrect implementation
-
-        public string StoreAddACusomter(string storeLoc, string firstName, string lastName, string phoneNumber)
+        public List<CStore> GetAllStores()
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbStore = context.Stores.Include(x => x.Storecustomers)
-                                           .ThenInclude(x=>x.Customer)
-                                            .First(x => x.Storeloc == storeLoc);
-            // empty store with no customer info
-            var conStore = new CStore(dbStore.Storeloc, dbStore.Storephone);
-     
-            // begin
-            foreach (var cust in dbStore.Storecustomers)
+            var dbStores = context.Stores.ToList();
+            List<CStore> stores = new List<CStore>();
+            foreach (var store in dbStores)
             {
-                // extra phone number colunmn can be used for search
-                CCustomer conCustomer = new CCustomer(cust.Customer.Firstname, cust.Customer.Lastname,cust.Customer.Phonenumber);
-                conStore.CustomerDict[cust.Customerid] = conCustomer;
+                CStore s = new CStore(store.Storeloc, store.Storephone);
+                stores.Add(s);
             }
-           
-            // refactor 
-            SimpleSearch ss = new SimpleSearch();
-            // "" string if not found    
-            string CID = "";
-            bool found = ss.SearchByName(conStore, firstName, lastName, out CID);
-            if (found)
-            {               
-            }
-            else
-            {
-                string newCID = CIDGen.Gen();
-                CID = newCID;
-                var newCustomer = new Customer {
-                    Customerid = newCID,
-                    Firstname = firstName,
-                    Lastname = lastName,
-                    Phonenumber = phoneNumber
-                };
-                context.Customers.Add(newCustomer);       
-                context.SaveChanges();
-
-                var newBridge = new Storecustomer
-                {
-                    Storeloc = storeLoc,
-                    Customerid = newCID
-                };
-                context.Storecustomers.Add(newBridge);
-                context.SaveChanges();
-            }
-            return CID;
+            return stores;
         }
 
+        public void StoreAddOneCusomter(string storeLoc, CCustomer customer)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            // only have this part below in the data model, rest moves to console main
+            var newCustomer = new Customer {
+                Customerid = customer.Customerid,
+                Firstname = customer.FirstName,
+                Lastname = customer.LastName,
+                Phonenumber = customer.PhoneNumber
+            };
+            context.Customers.Add(newCustomer);       
+            context.SaveChanges();
+
+            // many to many, bridge table gets updated as well
+            var newBridge = new Storecustomer
+            {
+                Storeloc = storeLoc,
+                Customerid = customer.Customerid
+            };
+            context.Storecustomers.Add(newBridge);
+            context.SaveChanges();
+            }            
+        }
+
+
+
+
+        // same changes, only keep the part that updates tables, move others to class model or console main
         public bool CustomerPlaceAnOrder(string storeLoc, string firstName, string lastName,string phoneNumber,List<CProduct> productList)
         {
             using var context = new Project0databaseContext(_contextOptions);
             var dbStore = context.Stores.Include(x => x.Inventories)
                                                  .ThenInclude(x => x.Product)
                                                    .First(x => x.Storeloc == storeLoc);
-            //.Include(x => x.Storecustomers)
-            //.ThenInclude(x => x.Customer)
-            //.ThenInclude(x => x.Orderrs)
-            //.ThenInclude(x => x.Orderproducts)
-            //.ThenInclude(x => x.Product)
-            //.ThenInclude(x => x.Inventories)
+            
 
             var conStore = new CStore(dbStore.Storeloc, dbStore.Storephone);
             List<CProduct> inventory = new List<CProduct>();

@@ -11,8 +11,11 @@ namespace StoreDatamodel
         CStore GetAStore(string storeLoc);
         List<CProduct> GetInventoryOfAStore(string storeLoc);
         Dictionary<string, CCustomer> GetAllCustomersAtOneStore(string storeLoc);
-        List<COrder> GetAllOrdersOfOneCustomer(string customerid);
+        List<COrder> GetAllOrdersOfOneCustomer(string customerid, CStore store, CCustomer customer);
         List<CProduct> GetAllProductsOfOneOrder(string orderid);
+
+        // helper methods to display all store locations, only contain location and store phone number
+        List<CStore> GetAllStores(); 
 
         // all add methods take library model objects, convert them to dbcontext objects and map them to db
         void StoreAddOneCustomer(CCustomer newCustomer);

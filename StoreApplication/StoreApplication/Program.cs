@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StoreApplication.Display;
 using StoreDatamodel;
 using StoreLibrary;
+using StoreLibrary.IDGenerator;
 using StoreLibrary.Search;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,6 @@ namespace StoreApplication
             IDisplay sd = new SimpleDisplay();
             ISearch ss = new SimpleSearch();
     
-            // 
-            // enter and exit
             Console.WriteLine("Welcome to XYZ Enterprise, enter any key to continue, 'x' to exit");
 
             // all inputs have a validation method to process Ivalid inputs
@@ -45,53 +44,68 @@ namespace StoreApplication
                 // JsonFilePersist persist = new JsonFilePersist(path);
                 // CStore store = persist.ReadStoreData();
 
-                // Testing new mvc version
+                // new mvc version
                 Console.WriteLine("Select a store location first:");
                 string storeLoc = Console.ReadLine();
                 CStore store = repo.GetAStore(storeLoc);
+                InventorySetup(repo, storeLoc, store);
                 Console.WriteLine("\nChoose one of the following operations:\n  1.Restock 2.Add a new customer\n  3.Process an order\n  4.Search in database\n  5.Display an order\n ");
-                // extra validation
+                // validation
 
-                choice = Console.ReadLine();               
+                bool hasProfileSetup = false;
+
+                choice = Console.ReadLine();
                 if (choice == "1")
-                {
-                    List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);
-                    // map list to dictionary and consolidate products of the same ID
-                    // product1 quantity 5,10,20 -> quantity 35
-                    // clean current inventory to match data pulled
-                    store.CleanInventory();
-                    store.AddProducts(inventory);
-                    Console.WriteLine("Inventory has been restocked");
+                {                    
+                    // not the same as add inventory, more like reset inventory
+                    InventorySetup(repo, storeLoc, store);                        
                     // a new option to display current inventory
                     // sd.DisplayInventory();
                 }
                 else if (choice == "2")
                 {
-                    Console.WriteLine("What is the customer's first name?");
-                    string firstname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's last name?");
-                    string lastname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's phone number?");
-                    string phonenumber = Console.ReadLine();
-
-                    Dictionary<string, CCustomer> customers = repo.GetAllCustomersAtOneStore(storeLoc);
-                    // customers have no order histroy atm
-                    store.CustomerDict = customers;
-                    string customerid;
-                    // by name or by name and phone
-                    bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
-                    if (Found)
+                    // avoid repetition if already has all customer profiles
+                    if (!hasProfileSetup)
                     {
-                        Console.WriteLine($"Dear Customer, you already have a profile with us, here is your id {customerid}");
+                        CustomerSetup(repo, storeLoc, store);
+                        hasProfileSetup = true;
                     }
-                    else
+                    // add a new customer profile if not exist, or nothing
+                    CheckAndAddOneCustomerSetup(repo, storeLoc, store,ss);
+                }
+                else if (choice == "3")
+                {
+                    // same process as choiece 2 in the beginning
+                    if (!hasProfileSetup)
                     {
-                        // no customer has no customerid to begin with and no order history atm
-                        CCustomer newCustomer = new CCustomer(firstname, lastname, phonenumber);
-                        store.AddCustomer(newCustomer);
-
+                        CustomerSetup(repo, storeLoc, store);
+                        hasProfileSetup = true;
                     }
-                
+                    CheckAndAddOneCustomerSetup(repo, storeLoc, store, ss);
+
+                    // map products to an order, orders to a customer,
+                    // store now has complete information
+                    foreach (var pair in store.CustomerDict)
+                    {
+                        CCustomer customer = pair.Value;
+                        customer.OrderHistory = repo.GetAllOrdersOfOneCustomer(customer.Customerid, store, customer);
+                        foreach (var order in customer.OrderHistory)
+                        {
+                            order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
+                            order.TotalCost = store.CalculateTotalPrice(order.ProductList);
+                        }
+                    
+                    }
+
+                    // real process begins
+                    List<CProduct> products = ProductsSetup();
+                    COrder order = new COrder(orderid, store, customer, DateTime.Now, total);
+                    store.UpdateCustomerOrder()
+
+
+
+
+
                 }
 
                
@@ -116,19 +130,7 @@ namespace StoreApplication
                 choice = Console.ReadLine();
                 if (choice == "1")
                 {
-                    Console.WriteLine("What is the store location?");
-                    string storeLoc = Console.ReadLine();
-
-                    Console.WriteLine("What is the customer's first name?");
-                    string firstname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's last name?");
-                    string lastname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's phone?");
-                    string phone = Console.ReadLine();
-                    repo.StoreAddACusomter(storeLoc, firstname, lastname, phone);
-
-                    //CCustomer newCustomer = CustomerSetup(store);                                        
-                    //store.AddCustomer(newCustomer);
+                    
                 }
                 else if (choice == "2")
                 {
@@ -210,8 +212,7 @@ namespace StoreApplication
 
                 else if (choice == "3")
                 {
-                    Console.WriteLine("Enter the store location");
-                    string storeLoc = Console.ReadLine();
+                    
 
                     Console.WriteLine("Enter Customer's first name");
                     string firstname = Console.ReadLine();
@@ -280,23 +281,58 @@ namespace StoreApplication
             } 
         }
 
-        
-        /*
-        private static CCustomer CustomerSetup(CStore store)
+
+        // new      
+        private static void CustomerSetup(IStoreRepository repo, string storeLoc, CStore store)
         {
-            Console.WriteLine("What is the customer id?");
-            string customerid = Console.ReadLine();
+            Dictionary<string, CCustomer> customers = repo.GetAllCustomersAtOneStore(storeLoc);
+            store.CustomerDict = customers;
+            Console.WriteLine("Initial customer profile set up done");
+        }
+
+        private static void InventorySetup(IStoreRepository repo, string storeLoc, CStore store)
+        {
+            List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);           
+            store.CleanInventory();
+            store.AddProducts(inventory);
+            Console.WriteLine("Initial inventory set up done");
+        }
+
+        // too much pre-loading of data
+        private static void CustomerAndInventorySetup(IStoreRepository repo, string storeLoc, CStore store)
+        {
+            CustomerSetup(repo, storeLoc, store);
+            InventorySetup(repo, storeLoc, store);
+        }
+
+        private static void CheckAndAddOneCustomerSetup(StoreRepository repo,string storeLoc,CStore store,ISearch ss)
+        {
+            // validation
             Console.WriteLine("What is the customer's first name?");
             string firstname = Console.ReadLine();
             Console.WriteLine("What is the customer's last name?");
             string lastname = Console.ReadLine();
-            Console.WriteLine("What is the customer's phone?");    
-            string phone = Console.ReadLine();
+            Console.WriteLine("What is the customer's phone number?");
+            string phonenumber = Console.ReadLine();
 
-            CCustomer newCustomer = new CCustomer(customerid, firstname, lastname, phone);
-            return newCustomer;
+            string customerid;
+            // by name or by name and phone
+            bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
+            if (Found)
+            {
+                Console.WriteLine($"Dear Customer, you already have a profile with us, here is your customer id {customerid}");
+            }
+            else
+            {
+                // new customer has no order history atm
+                string CID = CIDGen.Gen();
+                CCustomer newCustomer = new CCustomer(CID, firstname, lastname, phonenumber);
+                store.AddCustomer(newCustomer);
+                repo.StoreAddOneCusomter(storeLoc, newCustomer);
+                Console.WriteLine($"Dear {CID}, your profile has been set up successfuly");
+            }
         }
-        */
+
 
 
         private static List<CProduct> ProductsSetup()
@@ -304,7 +340,6 @@ namespace StoreApplication
             List<CProduct> productList = new List<CProduct>();
             Console.WriteLine("Setting up products, enter any key to continue, enter 'x' to exit");
             string init = Console.ReadLine();
-            bool hasNext = true;
             while (init != "x")
             {
                 Console.WriteLine("Enter Product unique ID");
@@ -331,11 +366,8 @@ namespace StoreApplication
 
                 Console.WriteLine("Press x to end");
                 init = Console.ReadLine();
-
             }
-
             return productList;
-
         }
 
         static string GetConnectionString()
