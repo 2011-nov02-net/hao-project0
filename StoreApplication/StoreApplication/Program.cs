@@ -21,8 +21,6 @@ namespace StoreApplication
 
         static void Main(string[] args)
         {
-
-
             using var logStream = new StreamWriter("ef-logs.txt");
             var optionsBuilder = new DbContextOptionsBuilder<Project0databaseContext>();
             optionsBuilder.UseSqlServer(GetConnectionString());

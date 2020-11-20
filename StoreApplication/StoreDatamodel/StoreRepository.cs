@@ -36,15 +36,27 @@ namespace StoreDatamodel
             return store;
         }
 
-        // create a list of products that can be added to a default store
-        public CStore GetAStoreInventory(string storeLoc)
+        // create a dict of products that can be added to a default store
+        public Dictionary<string, CProduct> GetInventoryOfAStore(string storeLoc)
         {
-            throw new NotImplementedException();
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbStore = context.Stores.Include(x => x.Inventories)
+                                            .ThenInclude(x => x.Product)
+                                                .First(x => x.Storeloc == storeLoc);
+            Dictionary<string, CProduct> inventory = new Dictionary<string, CProduct>();
+            foreach (var product in dbStore.Inventories)
+            {
+                CProduct p = new CProduct(product.Product.Productid, product.Product.Name, 
+                                            product.Product.Category, product.Product.Price, product.Quantity);
+                inventory[p.UniqueID] = p;
+            }
+            return inventory;
+
         }
 
-        public List<CCustomer> GetAllCustomersAtOneStore(string storeLoc)
+        public Dictionary<string, CProduct> GetAllCustomersAtOneStore(string storeLoc)
         {
-            throw new NotImplementedException();
+            
         }
 
         public List<COrder> GetAllOrdersOfOneCustomer(string customerid)
