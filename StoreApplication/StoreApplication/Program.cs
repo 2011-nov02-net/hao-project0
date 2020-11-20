@@ -29,7 +29,9 @@ namespace StoreApplication
 
             StoreRepository repo = new StoreRepository(s_dbContextOptions);
             SimpleDisplay sd = new SimpleDisplay();
+            SimpleSearch ss = new SimpleSearch();
     
+            // 
             // enter and exit
             Console.WriteLine("Welcome to XYZ Enterprise, enter any key to continue, 'x' to exit");
 
@@ -42,6 +44,61 @@ namespace StoreApplication
                 // string path = "../../../SimplyWriteData.json";
                 // JsonFilePersist persist = new JsonFilePersist(path);
                 // CStore store = persist.ReadStoreData();
+
+                // Testing new mvc version
+                Console.WriteLine("Select a store location first:");
+                string storeLoc = Console.ReadLine();
+                CStore store = repo.GetAStore(storeLoc);
+                Console.WriteLine("\nChoose one of the following operations:\n  1.Restock 2.Add a new customer\n  3.Process an order\n  4.Search in database\n  5.Display an order\n ");
+                // extra validation
+
+                choice = Console.ReadLine();               
+                if (choice == "1")
+                {
+                    List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);
+                    // map list to dictionary and consolidate products of the same ID
+                    // product1 quantity 5,10,20 -> quantity 35
+                    store.AddProducts(inventory);
+                    Console.WriteLine("Inventory has been restocked");
+                    // a new option to display current inventory
+                    // sd.DisplayInventory();
+                }
+                else if (choice == "2")
+                {
+                    Console.WriteLine("What is the customer's first name?");
+                    string firstname = Console.ReadLine();
+                    Console.WriteLine("What is the customer's last name?");
+                    string lastname = Console.ReadLine();
+                    Console.WriteLine("What is the customer's phone number?");
+                    string phonenumber = Console.ReadLine();
+
+                    Dictionary<string, CCustomer> customers = repo.GetAllCustomersAtOneStore(storeLoc);
+                    // customers have no order histroy atm
+                    store.CustomerDict = customers;
+                    string customerid;
+                    bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
+                    if (Found)
+                    { 
+                        Console.WriteLine("")
+                    }
+                
+                }
+
+               
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search in database\n  4.Display an order\n ");
                 // extra validation

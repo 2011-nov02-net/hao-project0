@@ -37,18 +37,18 @@ namespace StoreDatamodel
         }
 
         // create a dict of products that can be added to a given store
-        public Dictionary<string, CProduct> GetInventoryOfAStore(string storeLoc)
+        public List<CProduct> GetInventoryOfAStore(string storeLoc)
         {
             using var context = new Project0databaseContext(_contextOptions);
             var dbStore = context.Stores.Include(x => x.Inventories)
                                             .ThenInclude(x => x.Product)
                                                 .First(x => x.Storeloc == storeLoc);
-            Dictionary<string, CProduct> inventory = new Dictionary<string, CProduct>();
+            List<CProduct> inventory = new List<CProduct>();
             foreach (var product in dbStore.Inventories)
             {
                 CProduct p = new CProduct(product.Product.Productid, product.Product.Name, 
                                             product.Product.Category, product.Product.Price, product.Quantity);
-                inventory[p.UniqueID] = p;
+                inventory.Add(p);
             }
             return inventory;
         }
