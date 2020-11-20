@@ -28,8 +28,8 @@ namespace StoreApplication
             s_dbContextOptions = optionsBuilder.Options;
 
             StoreRepository repo = new StoreRepository(s_dbContextOptions);
-            SimpleDisplay sd = new SimpleDisplay();
-            SimpleSearch ss = new SimpleSearch();
+            IDisplay sd = new SimpleDisplay();
+            ISearch ss = new SimpleSearch();
     
             // 
             // enter and exit
@@ -58,7 +58,7 @@ namespace StoreApplication
                     List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);
                     // map list to dictionary and consolidate products of the same ID
                     // product1 quantity 5,10,20 -> quantity 35
-                    // clean current inventory to match data oulled
+                    // clean current inventory to match data pulled
                     store.CleanInventory();
                     store.AddProducts(inventory);
                     Console.WriteLine("Inventory has been restocked");
@@ -78,6 +78,7 @@ namespace StoreApplication
                     // customers have no order histroy atm
                     store.CustomerDict = customers;
                     string customerid;
+                    // by name or by name and phone
                     bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
                     if (Found)
                     {
