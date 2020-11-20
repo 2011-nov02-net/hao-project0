@@ -157,6 +157,15 @@ namespace StoreLibrary
             }      
         }
 
+        // restock options grab all previous and new supply from database
+        // need to clean local inventory so both quantities match
+        // temporary solution
+        public void CleanInventory()
+        { 
+            Inventory = new Dictionary<string, CProduct>();
+        }
+
+
         /// <summary>
         /// store's behavior to validate an order based on current product quantity
         /// </summary>

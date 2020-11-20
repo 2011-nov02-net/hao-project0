@@ -58,6 +58,8 @@ namespace StoreApplication
                     List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);
                     // map list to dictionary and consolidate products of the same ID
                     // product1 quantity 5,10,20 -> quantity 35
+                    // clean current inventory to match data oulled
+                    store.CleanInventory();
                     store.AddProducts(inventory);
                     Console.WriteLine("Inventory has been restocked");
                     // a new option to display current inventory
@@ -78,8 +80,15 @@ namespace StoreApplication
                     string customerid;
                     bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
                     if (Found)
-                    { 
-                        Console.WriteLine("")
+                    {
+                        Console.WriteLine($"Dear Customer, you already have a profile with us, here is your id {customerid}");
+                    }
+                    else
+                    {
+                        // no customer has no customerid to begin with and no order history atm
+                        CCustomer newCustomer = new CCustomer(firstname, lastname, phonenumber);
+                        store.AddCustomer(newCustomer);
+
                     }
                 
                 }
