@@ -9,7 +9,7 @@ using System.Text;
 
 namespace StoreDatamodel
 {
-    public class StoreRepository
+    public class StoreRepository: IStoreRepository
     {
         private readonly DbContextOptions<Project0databaseContext> _contextOptions;
         public StoreRepository(DbContextOptions<Project0databaseContext> contextOptions)
@@ -25,36 +25,50 @@ namespace StoreDatamodel
             return conProducts;
         }
 
-        // join product and orderproduct
-        public CProduct GetFirstProductById(string productid)
+        // M V C design
+        // re-implementation seperating business and data-access
+        // create a default store with no customer profile and inventory
+        public CStore GetAStore(string storeLoc)
         {
             using var context = new Project0databaseContext(_contextOptions);
-            Product dbProduct = context.Products
-                                        .Include(c => c.Orderproducts)
-                                        .First(c => c.Productid == productid);
+            var dbStore = context.Stores.First(x => x.Storeloc == storeLoc);
+            CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);
+            return store;
+        }
 
-            CProduct conProduct = new CProduct(dbProduct.Productid, dbProduct.Name, dbProduct.Category, dbProduct.Price, dbProduct.Orderproducts.First().Quantity);
-            return conProduct;
+        // create a list of products that can be added to a default store
+        public CStore GetAStoreInventory(string storeLoc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<CCustomer> GetAllCustomersAtOneStore(string storeLoc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<COrder> GetAllOrdersOfOneCustomer(string customerid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<CProduct> GetAllProductsOfOneOrder(string orderid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void StoreAddOneCustomer(CCustomer newCustomer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CustomerPlaceOneOrder(COrder newOrder)
+        {
+            throw new NotImplementedException();
         }
 
 
-        public List<CProduct> GetAllProductsById(string productid)
-        {
-            using var context = new Project0databaseContext(_contextOptions);
-            Product dbProduct = context.Products
-                                    .Include(c => c.Orderproducts)
-                                    .First(c => c.Productid == productid);
-
-            List<CProduct> conProducts = new List<CProduct>();
-
-            foreach (var product in dbProduct.Orderproducts)
-            {
-                CProduct conProduct = new CProduct(dbProduct.Productid, dbProduct.Name, dbProduct.Category, dbProduct.Price, product.Quantity);
-                conProducts.Add(conProduct);
-            }
-            return conProducts;
-        }
-
+        // incorrect implementation
 
         public string StoreAddACusomter(string storeLoc, string firstName, string lastName, string phoneNumber)
         {
@@ -222,11 +236,6 @@ namespace StoreDatamodel
                 return false;
         }
 
-
-
-
-
-
-
+       
     }
 }
