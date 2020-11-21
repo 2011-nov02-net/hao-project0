@@ -142,11 +142,11 @@ namespace StoreApplication
                     while (true)
                     {
                         Console.WriteLine("Enter Customer's first name");
-                        string firstname = Console.ReadLine();
+                        string firstname = ValidateNotNull(Console.ReadLine());
                         Console.WriteLine("Enter Customer's last name");
-                        string lastname = Console.ReadLine();
+                        string lastname = ValidateNotNull(Console.ReadLine());
                         Console.WriteLine("Enter Customer's phone number");
-                        string phonenumber = Console.ReadLine();
+                        string phonenumber = ValidatePhonenumber(Console.ReadLine());
 
                         CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
                         if (NullChecker(foundCustomer)) continue;
@@ -162,7 +162,7 @@ namespace StoreApplication
                     while (true)
                     {
                         Console.WriteLine("What is the orderid?");
-                        string orderid = Console.ReadLine();
+                        string orderid = ValidateNotNull(Console.ReadLine());
                         COrder foundOrder = repo.GetAnOrderByID(orderid);
                         if (NullChecker(foundOrder)) continue;
                         else
@@ -179,11 +179,11 @@ namespace StoreApplication
                     {
                         // same as search for a customer in the beginning
                         Console.WriteLine("Enter Customer's first name");
-                        string firstname = Console.ReadLine();
+                        string firstname = ValidateNotNull(Console.ReadLine());
                         Console.WriteLine("Enter Customer's last name");
-                        string lastname = Console.ReadLine();
+                        string lastname = ValidateNotNull(Console.ReadLine());
                         Console.WriteLine("Enter Customer's phone number");
-                        string phonenumber = Console.ReadLine();
+                        string phonenumber = ValidatePhonenumber(Console.ReadLine());
                         CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
 
                         if (NullChecker(foundCustomer)) continue;
@@ -199,7 +199,7 @@ namespace StoreApplication
                     while (true)
                     {
                         Console.WriteLine("What is the store location you seek?");
-                        string seekLoc = Console.ReadLine();
+                        string seekLoc = ValidateNotNull(Console.ReadLine());
                         CStore seekStore = repo.GetAStore(seekLoc);
                         if (NullChecker(seekStore)) continue;
 
@@ -249,13 +249,11 @@ namespace StoreApplication
         {
             
             Console.WriteLine("What is the customer's first name?");
-            string firstname = Console.ReadLine();
+            string firstname = ValidateNotNull(Console.ReadLine());
             Console.WriteLine("What is the customer's last name?");
-            string lastname = Console.ReadLine();
-            Console.WriteLine("What is the customer's phone number?");
-            // validation
-            string phonenumber = Console.ReadLine();
-
+            string lastname = ValidateNotNull(Console.ReadLine());
+            Console.WriteLine("What is the customer's phone number?");         
+            string phonenumber = ValidatePhonenumber(Console.ReadLine());
             string customerid;
             // or use repo.GetOneCustomerByNameAndPhone, check null reference
             // can delay setting up customer profiles
@@ -284,24 +282,18 @@ namespace StoreApplication
             string init = Console.ReadLine();
             while (init != "x")
             {                 
-
                 Console.WriteLine("Enter Product name");
-                string name = Console.ReadLine();
-
+                string name = ValidateNotNull(Console.ReadLine());
                 Console.WriteLine("Enter Product category");
-                string category = Console.ReadLine();
-
+                string category = ValidateNotNull(Console.ReadLine());
                 /*
                 Console.WriteLine("Enter Product price");
                 string priceStr = Console.ReadLine();
                 double price;
                 Double.TryParse(priceStr, out price);
                 */
-
                 Console.WriteLine("Enter Product quantity");
-                string quantityStr = Console.ReadLine();
-                int quantity;
-                int.TryParse(quantityStr, out quantity);
+                int quantity = ValidateInt(Console.ReadLine());               
                
                 CProduct p = repo.GetAProductByNameAndCategory(name, category);
                 if (NullChecker(p)) continue;
@@ -334,6 +326,7 @@ namespace StoreApplication
             return connectionString;
         }
 
+        // check object created from db
         private static bool NullChecker(Object obj)
         {
             if (obj == null)
@@ -342,6 +335,118 @@ namespace StoreApplication
                 return true;
             }
             else return false;   
+        }
+
+
+        // validate attributes that cannot be null
+        private static string ValidateNotNull(string input)
+        {
+            while (true)
+            {
+                if (input == null || input == "")
+                {
+                    Console.WriteLine("Cannot be empty");
+                    input = Console.ReadLine();
+                    continue;
+                }
+                else
+                {
+                    return input;
+                }
+            }
+        }
+
+        // validate phone number , not null, len = 10, numbers only
+        private static string ValidatePhonenumber(string phoneNumber)
+        {
+            while (true)
+            {
+                if (phoneNumber == null || phoneNumber == "")
+                {
+                    Console.WriteLine("Cannot be empty");
+                    phoneNumber = Console.ReadLine();
+                    continue;
+                }
+                else
+                {
+                    if (phoneNumber.Length == 10)
+                    {
+                        // need to have regular expression
+                        // can only contain numbers
+                        return phoneNumber;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not enough digits");
+                        phoneNumber = Console.ReadLine();
+                        continue;
+                    }
+
+                    
+                }
+            }
+        }
+
+        // validate quantity, not null, > 0
+        private static int ValidateInt(string number)
+        {
+            while (true)
+            {
+                if (number == null || number == "")
+                {
+                    Console.WriteLine("Cannot be empty");
+                    number = Console.ReadLine();
+                    continue;
+                }
+                else
+                {
+                    int value = 0;
+                    int.TryParse(number, out value);
+                    if (value > 0)
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Value must be positive");
+                        number = Console.ReadLine();
+                        continue;
+                    }
+                }
+            }
+            
+             
+        }
+
+        // validate price, not null, > 0
+        // not used
+        private static double ValidateDouble(string number)
+        {
+            while (true)
+            {
+                if (number == null || number == "")
+                {
+                    Console.WriteLine("Cannot be empty");
+                    number = Console.ReadLine();
+                    continue;
+                }
+                else
+                {
+                    double value = 0;
+                    double.TryParse(number, out value);
+                    if (value > 0)
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Value must be positive");
+                        number = Console.ReadLine();
+                        continue;
+                    }
+                }
+            }
         }
 
     }
