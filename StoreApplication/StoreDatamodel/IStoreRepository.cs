@@ -18,9 +18,13 @@ namespace StoreDatamodel
         List<CStore> GetAllStores(); 
 
         // all add methods take library model objects, convert them to dbcontext objects and map them to db
-        void StoreAddOneCustomer(CCustomer newCustomer);
+        void StoreAddOneCustomer(string storeLoc, CCustomer customer);
 
-        void CustomerPlaceOneOrder(COrder newOrder);
+        void CustomerPlaceOneOrder(COrder order, CStore store, double totalCost);
+
+        CCustomer GetOneCustomerByNameAndPhone(string firstName, string lastName, string phonenumber);
+
+        COrder GetAnOrderByID(string orderid);
 
         // other methods tbd
 

@@ -93,6 +93,7 @@ namespace StoreDatamodel
         // create a list of products for an order
         public List<CProduct> GetAllProductsOfOneOrder(string orderid)
         {
+            // did not calculate total
             using var context = new Project0databaseContext(_contextOptions);
             var dbOrder = context.Orderrs.Include(x => x.Orderproducts)
                                             .ThenInclude(x => x.Product)
@@ -141,125 +142,99 @@ namespace StoreDatamodel
             };
             context.Storecustomers.Add(newBridge);
             context.SaveChanges();
-            }            
+                      
         }
-
-
-
 
         // same changes, only keep the part that updates tables, move others to class model or console main
-        public bool CustomerPlaceAnOrder(string storeLoc, string firstName, string lastName,string phoneNumber,List<CProduct> productList)
+        public void CustomerPlaceOneOrder(COrder order, CStore store, double totalCost )
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbStore = context.Stores.Include(x => x.Inventories)
-                                                 .ThenInclude(x => x.Product)
-                                                   .First(x => x.Storeloc == storeLoc);
-            
-
-            var conStore = new CStore(dbStore.Storeloc, dbStore.Storephone);
-            List<CProduct> inventory = new List<CProduct>();
-
-            foreach (var product in dbStore.Inventories)
+            // update order
+            var newOrder = new Orderr
             {
-                CProduct p = new CProduct(product.Productid,product.Product.Name, product.Product.Category, product.Product.Price, product.Quantity);               
-                inventory.Add(p);
-               
-            }
-            // dictionary "productid":product(contains quantity)
-            conStore.AddProducts(inventory);
+                Orderid = order.Orderid,
+                Storeloc = order.StoreLocation.Storeloc,
+                Customerid = order.Customer.Customerid,
+                Orderedtime = DateTime.Now,
+                Totalcost = totalCost
+            };
+            context.Orderrs.Add(newOrder);
+            context.SaveChanges();
 
-            // check customer's quantity against inventory quantity
-            bool isEnough = conStore.CheckInventory(productList);
-            string customerid;
-            if (isEnough)
+            // update Orderproduct  
+            foreach (var product in order.ProductList)
             {
-                customerid = StoreAddACusomter(storeLoc, firstName, lastName, phoneNumber);
-                // Customer table and Storecustomer table updated
-
-                // update order
-                string orderid = OIDGen.Gen();              
-                double total = conStore.CalculateTotalPrice(productList);
-                var newOrder = new Orderr
+                var newOP = new Orderproduct
                 {
-                    Orderid = orderid,
-                    Storeloc = storeLoc,
-                    Customerid = customerid,
-                    Orderedtime = DateTime.Now,
-                    Totalcost = total
+                    Orderid = order.Orderid,
+                    Productid = product.UniqueID,
+                    Quantity = product.Quantity
                 };
-                context.Orderrs.Add(newOrder);
-                context.SaveChanges();
+                context.Orderproducts.Add(newOP);
+            }
+            context.SaveChanges();
 
-                // update Orderproduct  
-                foreach (var product in productList)
+            var dbStore = context.Stores.Include(x => x.Inventories)
+                                                .First(x => x.Storeloc == order.StoreLocation.Storeloc);
+            // update inventory quantity          
+            foreach (var product in order.ProductList)
+            {
+                foreach (var dbProd in dbStore.Inventories)
                 {
-                    var newOP = new Orderproduct
+                    if (product.UniqueID == dbProd.Productid)
                     {
-                        Orderid = orderid,
-                        Productid = product.UniqueID,
-                        Quantity = product.Quantity
-                    };
-                    context.Orderproducts.Add(newOP);
+                        dbProd.Quantity = store.Inventory[product.UniqueID].Quantity;
+                    }
                 }
-                context.SaveChanges();
-
-                // update inventory locally and map edited quantity
-                conStore.UpdateInventory(productList);
-                foreach (var product in dbStore.Inventories)
-                {
-                    product.Quantity = conStore.Inventory[product.Productid].Quantity;
-                }
-                context.SaveChanges();
-                return true;
             }
-            else {
-                return false;
-            }
-        }
-
-        public Orderr FindAnOrder(string orderid)
-        {
-            using var context = new Project0databaseContext(_contextOptions);
-            Orderr dbOrders = context.Orderrs
-                                    .Include(x => x.Orderproducts)
-                                    .ThenInclude(x => x.Product)
-                                    .Where(x => x.Orderid == orderid)
-                                    .First();
-            return dbOrders;                    
-        }
+            context.SaveChanges();
+            
+        }    
 
         // refactor
-        public bool CustomerSearch(string storeLoc,string firstName,string lastName, out string CID)
+        public CCustomer GetOneCustomerByNameAndPhone(string firstName,string lastName, string phonenumber)
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbStore = context.Stores.Include(x => x.Storecustomers)
-                                           .ThenInclude(x => x.Customer)
-                                            .First(x => x.Storeloc == storeLoc);
-            // empty store with no customer info
-            var conStore = new CStore(dbStore.Storeloc, dbStore.Storephone);
-
-            // begin
-            foreach (var cust in dbStore.Storecustomers)
+            var dbCustomer = context.Customers
+                             .FirstOrDefault(x => x.Firstname == firstName && x.Lastname == lastName && x.Phonenumber == phonenumber);
+            CCustomer foundCustomer;
+            if (dbCustomer != null)
             {
-                // extra phone number colunmn can be used for search
-                CCustomer conCustomer = new CCustomer(cust.Customer.Firstname, cust.Customer.Lastname, cust.Customer.Phonenumber);
-                conStore.CustomerDict[cust.Customerid] = conCustomer;
-            }
-
-            SimpleSearch ss = new SimpleSearch();
-            // "" string if not found
-
-        
-            bool found = ss.SearchByName(conStore, firstName, lastName, out CID);
-            if (found)
-            {
-
-                return true;
+                foundCustomer = new CCustomer(dbCustomer.Customerid,
+                                                    dbCustomer.Firstname, dbCustomer.Lastname, dbCustomer.Phonenumber);
             }
             else
-                return false;
+            {
+                foundCustomer = new CCustomer();
+            }
+                return foundCustomer;  
         }
 
-       
+        public COrder GetAnOrderByID(string orderid)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            Orderr dbOrder = context.Orderrs
+                                    .Include(x => x.Orderproducts)
+                                        .ThenInclude(x => x.Product)
+                                        .First(x => x.Orderid == orderid);
+            COrder order = new COrder(orderid, new CStore(dbOrder.Storeloc),
+                                               new CCustomer(dbOrder.Customer.Customerid, dbOrder.Customer.Firstname,
+                                                            dbOrder.Customer.Lastname, dbOrder.Customer.Phonenumber),
+                                               dbOrder.Orderedtime, dbOrder.Totalcost);
+            
+            foreach (var product in dbOrder.Orderproducts)
+            {
+                CProduct p = new CProduct(product.Product.Productid, product.Product.Name,
+                                        product.Product.Category, product.Product.Price, product.Quantity);
+                order.ProductList.Add(p);
+            }
+
+            return order;
+        }
+
+
+        public 
+
+
     }
 }

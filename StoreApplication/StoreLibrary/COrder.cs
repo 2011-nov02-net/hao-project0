@@ -77,7 +77,7 @@ namespace StoreLibrary
         /// <summary>
         /// default constructor
         /// </summary>
-        public COrder()
+        public COrder(string orderid)
         { }
 
         /// <summary>
@@ -100,5 +100,8 @@ namespace StoreLibrary
             OrderedTime = orderedTime;
             TotalCost = totalCost;
         }
+
+
+
     }
 }

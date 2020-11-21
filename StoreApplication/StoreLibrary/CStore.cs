@@ -119,7 +119,7 @@ namespace StoreLibrary
         /// store's behavior to update a customer's order history
         /// add a customer's profile if he is currently not a member
         /// </summary>
-        public void UpdateCustomerOrder(COrder order)
+        public void UpdateInventoryAndCustomerOrder(COrder order)
         {
             // only successful order gets updated
             if (CheckInventory(order))
@@ -157,15 +157,6 @@ namespace StoreLibrary
             }      
         }
 
-        // restock options grab all previous and new supply from database
-        // need to clean local inventory so both quantities match
-        // temporary solution
-        public void CleanInventory()
-        { 
-            Inventory = new Dictionary<string, CProduct>();
-        }
-
-
         /// <summary>
         /// store's behavior to validate an order based on current product quantity
         /// </summary>
@@ -199,6 +190,15 @@ namespace StoreLibrary
                 }
             }
             return true;
+        }
+
+
+        // restock options grab all previous and new supply from database
+        // need to clean local inventory so both quantities match
+        // temporary solution
+        public void CleanInventory()
+        {
+            Inventory = new Dictionary<string, CProduct>();
         }
 
 

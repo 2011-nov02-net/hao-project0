@@ -31,7 +31,7 @@ namespace StoreApplication
             StoreRepository repo = new StoreRepository(s_dbContextOptions);
             IDisplay sd = new SimpleDisplay();
             ISearch ss = new SimpleSearch();
-    
+
             Console.WriteLine("Welcome to XYZ Enterprise, enter any key to continue, 'x' to exit");
 
             // all inputs have a validation method to process Ivalid inputs
@@ -48,21 +48,15 @@ namespace StoreApplication
                 Console.WriteLine("Select a store location first:");
                 string storeLoc = Console.ReadLine();
                 CStore store = repo.GetAStore(storeLoc);
+
+                // set up inventory, not the same as add products, more like reset inventory
                 InventorySetup(repo, storeLoc, store);
-                Console.WriteLine("\nChoose one of the following operations:\n  1.Restock 2.Add a new customer\n  3.Process an order\n  4.Search in database\n  5.Display an order\n ");
+                Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search a customer\n  4.Display an order ");
                 // validation
 
                 bool hasProfileSetup = false;
-
                 choice = Console.ReadLine();
                 if (choice == "1")
-                {                    
-                    // not the same as add inventory, more like reset inventory
-                    InventorySetup(repo, storeLoc, store);                        
-                    // a new option to display current inventory
-                    // sd.DisplayInventory();
-                }
-                else if (choice == "2")
                 {
                     // avoid repetition if already has all customer profiles
                     if (!hasProfileSetup)
@@ -71,9 +65,9 @@ namespace StoreApplication
                         hasProfileSetup = true;
                     }
                     // add a new customer profile if not exist, or nothing
-                    CheckAndAddOneCustomerSetup(repo, storeLoc, store,ss);
+                    CheckAndAddOneCustomer(repo, storeLoc, store, ss);
                 }
-                else if (choice == "3")
+                else if (choice == "2")
                 {
                     // same process as choiece 2 in the beginning
                     if (!hasProfileSetup)
@@ -81,215 +75,119 @@ namespace StoreApplication
                         CustomerSetup(repo, storeLoc, store);
                         hasProfileSetup = true;
                     }
-                    CheckAndAddOneCustomerSetup(repo, storeLoc, store, ss);
+                    string customerid = CheckAndAddOneCustomer(repo, storeLoc, store, ss);
 
-                    // map products to an order, orders to a customer,
-                    // store now has complete information
-                    foreach (var pair in store.CustomerDict)
-                    {
-                        CCustomer customer = pair.Value;
-                        customer.OrderHistory = repo.GetAllOrdersOfOneCustomer(customer.Customerid, store, customer);
-                        foreach (var order in customer.OrderHistory)
-                        {
-                            order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
-                            order.TotalCost = store.CalculateTotalPrice(order.ProductList);
-                        }
-                    
-                    }
-
-                    // real process begins
+                    // process begins
                     List<CProduct> products = ProductsSetup();
-                    COrder order = new COrder(orderid, store, customer, DateTime.Now, total);
-                    store.UpdateCustomerOrder()
-
-
-
-
-
-                }
-
-               
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search in database\n  4.Display an order\n ");
-                // extra validation
-
-                choice = Console.ReadLine();
-                if (choice == "1")
-                {
-                    
-                }
-                else if (choice == "2")
-                {
-                    Console.WriteLine("What is the store location?");
-                    string storeLoc = Console.ReadLine();
-
-                    Console.WriteLine("What is the customer's first name?");
-                    string firstname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's last name?");
-                    string lastname = Console.ReadLine();
-                    Console.WriteLine("What is the customer's phone?");
-                    string phone = Console.ReadLine();
-
-                    List<CProduct> productList = ProductsSetup();
-                    bool isSuccessful = repo.CustomerPlaceAnOrder(storeLoc, firstname, lastname, phone, productList);
-                    if (isSuccessful)
-                    {
-                        Console.WriteLine("Order placed successful");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Order failed");
-                    }
-                    /*
-                    //ISearch ss = new SimpleSearch();
-                    // empty string if not found
-                    string customerid;
-                    bool found = ss.SearchByName(store, firstname, lastname,out customerid);
-                    CCustomer customer;
-                    // in order to create an order, first find the customer or create a new one
-                    if (!found)
-                    {
-                        customer = CustomerSetup(store);
-                        store.AddCustomer(customer);
-                        
-                    }
-                    else { customer = store.CustomerDict[customerid]; }
-                    */
-
-                    /*
-                    // products here
-                    // probably need another while loop if an order failed
-                    List<CProduct> productList = ProductsSetup();               
-             
-                    // exception handling here
-                    // two step process: order quantity within limits -> enough inventory
-                    
+                    string orderid = OIDGen.Gen();
+                    double totalCost = store.CalculateTotalPrice(products);
                     bool isSuccessful = false;
-                    COrder newOrder;
+                    COrder newOrder = new COrder(orderid, store, store.CustomerDict[customerid],
+                                                DateTime.Now, totalCost);
                     try
                     {
-                        // could contain quantity not allowed
-                        newOrder = new COrder(store, customer, DateTime.Now, 100, productList);
+                        // quantity limits
+                        newOrder.ProductList = products;
                         isSuccessful = true;
-                        Console.WriteLine("Order placed successfully!");
+                        Console.WriteLine("Order created successfully!");
                     }
                     catch (ArgumentException e)
                     {
                         isSuccessful = false;
-                        newOrder = new COrder();
-                        Console.WriteLine("This order exceeds the max allowed quantities");
+                        Console.WriteLine("This order exceeds the max allowed quantities, failed to create the order!");
                     }
 
-                    // failed order won't be processed
                     if (isSuccessful)
                     {
-                        if (store.CheckInventory(newOrder))
+                        if (!store.CheckInventory(newOrder))
                         {
-                            customer.PlaceOrder(store, newOrder);
-                            Console.WriteLine("Order placed successfullly");
+                            Console.WriteLine("Do not have enough products left to fulfill this order!");
                         }
                         else
                         {
-                            Console.WriteLine("Not enough quantity to fullfill");
+                            // map products to an order, orders to a customer,
+                            // store now has complete information
+                            foreach (var pair in store.CustomerDict)
+                            {
+                                CCustomer customer = pair.Value;
+                                customer.OrderHistory = repo.GetAllOrdersOfOneCustomer(customer.Customerid, store, customer);
+                                foreach (var order in customer.OrderHistory)
+                                {
+                                    order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
+                                    order.TotalCost = store.CalculateTotalPrice(order.ProductList);
+                                }
+
+                            }
+                            store.UpdateInventoryAndCustomerOrder(newOrder);
+                            repo.CustomerPlaceOneOrder(newOrder, store, totalCost);
                         }
                     }
-                    */
                 }
 
                 else if (choice == "3")
                 {
-                    
-
                     Console.WriteLine("Enter Customer's first name");
                     string firstname = Console.ReadLine();
                     Console.WriteLine("Enter Customer's last name");
-
                     string lastname = Console.ReadLine();
-                    string CID;
-                    bool found = repo.CustomerSearch(storeLoc, firstname, lastname,out CID);
-                    if (found)
-                        Console.WriteLine($"CustomerID: {CID} found, customer alreay exist in the database");
+                    Console.WriteLine("Enter Customer's phone number");
+                    string phonenumber = Console.ReadLine();
+
+                    CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
+                    if (foundCustomer.Customerid != null)
+                        Console.WriteLine($"{foundCustomer.Customerid} found, customer alreay exist in the database");
                     else
                         Console.WriteLine("Customer not found, proceed to option 1 to create a new profile");
-                    /*
-                    SimpleSearch ss = new SimpleSearch();
-                    // empty string if not found
-                    string customerid;
-                    bool found = ss.SearchByName(store, firstname, lastname, out customerid);
-                    if (found)
-                    {
-                        Console.WriteLine("customer profile does not exist");
-                    }
-                    else { Console.WriteLine("customer profile found"); }
-                    */
                 }
                 else if (choice == "4")
                 {
                     Console.WriteLine("What is the orderid?");
                     string orderid = Console.ReadLine();
-                    sd.DisplayOneOrder(repo.FindAnOrder(orderid));
+                    sd.DisplayOneOrder(repo.GetAnOrderByID(orderid));
+                }
+                else if (choice == "5")
+                {
+                    // search for a customer
+                    Console.WriteLine("Enter Customer's first name");
+                    string firstname = Console.ReadLine();
+                    Console.WriteLine("Enter Customer's last name");
+                    string lastname = Console.ReadLine();
+                    Console.WriteLine("Enter Customer's phone number");
+                    string phonenumber = Console.ReadLine();
+                    CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
+                    // 
+                    if (foundCustomer.Customerid != null)
+                        sd.DisplayAllOrders(foundCustomer.OrderHistory);
+                    else
+                        Console.WriteLine("Customer not found, proceed to option 1 to create a new profile");
+                }
+                else if (choice == "6")
+                {
+                    Console.WriteLine("What is the store location you seek?");
+                    string seekLoc = Console.ReadLine();
+                    CStore seekStore = repo.GetAStore(seekLoc);
+                    seekStore.CustomerDict = repo.GetAllCustomersAtOneStore(seekLoc);
+
+                    foreach (var pair in seekStore.CustomerDict)
+                    {
+                        CCustomer cust = pair.Value;
+                        cust.OrderHistory = repo.GetAllOrdersOfOneCustomer(cust.Customerid, seekStore, cust);
+                        foreach (var order in cust.OrderHistory)
+                        {
+                            order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
+                            order.TotalCost = store.CalculateTotalPrice(order.ProductList);
+                        }
+                        sd.DisplayAllOrders(cust.OrderHistory);
+                    }
+
+                   
                 }
 
-                    /*
-                    IDisplay sd = new SimpleDisplay();
-                    Console.WriteLine("1 Display an order\t 2 Display all orders of a customer\t 3 Display all orders of the store");
-                    int input = Console.Read();
-                    if (input == 1)
-                    {
-                        Console.WriteLine("Enter the customer'id who placed the order");
-                        string customerid = Console.ReadLine();
-                        Console.WriteLine("Enter the order number");
-                        string orderid = Console.ReadLine();
-                        // exception cutomerid or orderid not found
-                        foreach (var order in store.CustomerDict[customerid].OrderHistory)
-                        {
-                            if (order.Orderid == orderid)
-                            {
-                                sd.DisplayOneOrder(order);
-                            }
-                        }
-                        // no display means customerid or orderif typed wrong
-                    }
-                    else if (input == 2)
-                    {
-                        Console.WriteLine("Enter the customer'id who placed the order");
-                        string customerid = Console.ReadLine();
-                        sd.DisplayAllOrders(store.CustomerDict[customerid].OrderHistory);
-                    }
-                    else if (input == 3)
-                    {
-                        foreach (var pair in store.CustomerDict)
-                        {
-                            sd.DisplayAllOrders(pair.Value.OrderHistory);
-                        }
-                    }
-                    */ 
-            } 
+            }
         }
 
 
-        // new      
-        private static void CustomerSetup(IStoreRepository repo, string storeLoc, CStore store)
-        {
-            Dictionary<string, CCustomer> customers = repo.GetAllCustomersAtOneStore(storeLoc);
-            store.CustomerDict = customers;
-            Console.WriteLine("Initial customer profile set up done");
-        }
-
+        // helper classes refactored        
         private static void InventorySetup(IStoreRepository repo, string storeLoc, CStore store)
         {
             List<CProduct> inventory = repo.GetInventoryOfAStore(storeLoc);           
@@ -298,14 +196,15 @@ namespace StoreApplication
             Console.WriteLine("Initial inventory set up done");
         }
 
-        // too much pre-loading of data
-        private static void CustomerAndInventorySetup(IStoreRepository repo, string storeLoc, CStore store)
+        private static void CustomerSetup(IStoreRepository repo, string storeLoc, CStore store)
         {
-            CustomerSetup(repo, storeLoc, store);
-            InventorySetup(repo, storeLoc, store);
+            Dictionary<string, CCustomer> customers = repo.GetAllCustomersAtOneStore(storeLoc);
+            store.CustomerDict = customers;
+            Console.WriteLine("Initial customer profile set up done");
         }
 
-        private static void CheckAndAddOneCustomerSetup(StoreRepository repo,string storeLoc,CStore store,ISearch ss)
+
+        private static string CheckAndAddOneCustomer(StoreRepository repo,string storeLoc,CStore store,ISearch ss)
         {
             // validation
             Console.WriteLine("What is the customer's first name?");
@@ -325,15 +224,14 @@ namespace StoreApplication
             else
             {
                 // new customer has no order history atm
-                string CID = CIDGen.Gen();
-                CCustomer newCustomer = new CCustomer(CID, firstname, lastname, phonenumber);
+                customerid = CIDGen.Gen();
+                CCustomer newCustomer = new CCustomer(customerid, firstname, lastname, phonenumber);
                 store.AddCustomer(newCustomer);
                 repo.StoreAddOneCusomter(storeLoc, newCustomer);
-                Console.WriteLine($"Dear {CID}, your profile has been set up successfuly");
+                Console.WriteLine($"Dear {customerid}, your profile has been set up successfuly");
             }
+            return customerid;
         }
-
-
 
         private static List<CProduct> ProductsSetup()
         {
