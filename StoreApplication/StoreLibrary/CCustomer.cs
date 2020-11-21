@@ -74,7 +74,7 @@ namespace StoreLibrary
         /// <summary>
         public void PlaceOrder(CStore storeLocation, COrder newOrder )     
         {
-            storeLocation.UpdateCustomerOrder(newOrder);
+            storeLocation.UpdateInventoryAndCustomerOrder(newOrder);
         }
         
 

@@ -73,5 +73,13 @@ namespace StoreLibrary
             Quantity = quantity;
         }
 
+        public CProduct(string ID, string name, string category, double price)
+        {
+            UniqueID = ID;
+            Name = name;
+            Category = category;
+            Price = price;          
+        }
+
     }
 }

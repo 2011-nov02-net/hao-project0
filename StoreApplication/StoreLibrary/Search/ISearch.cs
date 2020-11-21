@@ -15,6 +15,6 @@ namespace StoreLibrary.Search
         /// method to serach by name and phone, the result is unique
         /// </summary>
         bool SearchByName(CStore storeLocation, string firstname, string lastname, out string customerid);
-        bool SearchByNameAndPhone(CStore storeLocation, string firstname, string lastname, string phonenumber out string customerid)
+        bool SearchByNameAndPhone(CStore storeLocation, string firstname, string lastname, string phonenumber, out string customerid);
     }
 }

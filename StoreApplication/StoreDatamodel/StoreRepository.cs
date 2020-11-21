@@ -9,7 +9,7 @@ using System.Text;
 
 namespace StoreDatamodel
 {
-    public class StoreRepository: IStoreRepository
+    public class StoreRepository : IStoreRepository
     {
         private readonly DbContextOptions<Project0databaseContext> _contextOptions;
         public StoreRepository(DbContextOptions<Project0databaseContext> contextOptions)
@@ -27,14 +27,31 @@ namespace StoreDatamodel
 
         // M V C design
         // re-implementation seperating business and data-access
-        // create a default store with no customer profile and inventory
+        // create a default store with no customer profile and inventory    
+
         public CStore GetAStore(string storeLoc)
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbStore = context.Stores.First(x => x.Storeloc == storeLoc);
-            CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);
+            var dbStore = context.Stores.FirstOrDefault(x => x.Storeloc == storeLoc);
+            if (dbStore == null) return null;
+            // store has no customer profile yet
+            CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);                            
             return store;
         }
+
+        /*
+        public CStore GetAMappedStore(string storeLoc)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbStore = context.Stores.Include(x => x.Storecustomers).ThenInclude(x => x.Customer)
+                                            .ThenInclude( x => x.Orderrs).ThenInclude(x => x.Orderproducts)
+                                            .ThenInclude( x => x.Product).ThenInclude( x=> x.Inventories)
+                                            .First(x => x.Storeloc == storeLoc);
+            CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);
+            //
+            return store;
+        }
+        */
 
         // create a dict of products that can be added to a given store
         public List<CProduct> GetInventoryOfAStore(string storeLoc)
@@ -42,11 +59,12 @@ namespace StoreDatamodel
             using var context = new Project0databaseContext(_contextOptions);
             var dbStore = context.Stores.Include(x => x.Inventories)
                                             .ThenInclude(x => x.Product)
-                                                .First(x => x.Storeloc == storeLoc);
+                                                .FirstOrDefault(x => x.Storeloc == storeLoc);
+            if (dbStore == null) return null;
             List<CProduct> inventory = new List<CProduct>();
             foreach (var product in dbStore.Inventories)
             {
-                CProduct p = new CProduct(product.Product.Productid, product.Product.Name, 
+                CProduct p = new CProduct(product.Product.Productid, product.Product.Name,
                                             product.Product.Category, product.Product.Price, product.Quantity);
                 inventory.Add(p);
             }
@@ -60,6 +78,7 @@ namespace StoreDatamodel
             var dbStore = context.Stores.Include(x => x.Storecustomers)
                                             .ThenInclude(x => x.Customer)
                                                 .First(x => x.Storeloc == storeLoc);
+            if (dbStore == null) return null;
             Dictionary<string, CCustomer> customers = new Dictionary<string, CCustomer>();
             foreach (var customer in dbStore.Storecustomers)
             {
@@ -76,13 +95,13 @@ namespace StoreDatamodel
         {
             using var context = new Project0databaseContext(_contextOptions);
             var dbCustomer = context.Customers.Include(x => x.Orderrs).First(x => x.Customerid == customerid);
-
+            if (dbCustomer == null) return null;
             List<COrder> orders = new List<COrder>();
             foreach (var order in dbCustomer.Orderrs)
             {
                 // these orders have no product list
-                // total cost set to 0 for now
-                COrder o = new COrder(order.Orderid, store, customer, DateTime.Now,0);
+                // total cost not yet set
+                COrder o = new COrder(order.Orderid, store, customer, DateTime.Now);
                 orders.Add(o);
             }
 
@@ -93,11 +112,11 @@ namespace StoreDatamodel
         // create a list of products for an order
         public List<CProduct> GetAllProductsOfOneOrder(string orderid)
         {
-            // did not calculate total
             using var context = new Project0databaseContext(_contextOptions);
             var dbOrder = context.Orderrs.Include(x => x.Orderproducts)
                                             .ThenInclude(x => x.Product)
                                                 .First(x => x.Orderid == orderid);
+            if (dbOrder == null) return null;
             List<CProduct> products = new List<CProduct>();
             foreach (var product in dbOrder.Orderproducts)
             {
@@ -106,12 +125,13 @@ namespace StoreDatamodel
                 products.Add(p);
             }
             return products;
-       }
+        }
 
         public List<CStore> GetAllStores()
         {
             using var context = new Project0databaseContext(_contextOptions);
             var dbStores = context.Stores.ToList();
+            if (dbStores == null) return null;
             List<CStore> stores = new List<CStore>();
             foreach (var store in dbStores)
             {
@@ -125,13 +145,14 @@ namespace StoreDatamodel
         {
             using var context = new Project0databaseContext(_contextOptions);
             // only have this part below in the data model, rest moves to console main
-            var newCustomer = new Customer {
+            var newCustomer = new Customer
+            {
                 Customerid = customer.Customerid,
                 Firstname = customer.FirstName,
                 Lastname = customer.LastName,
                 Phonenumber = customer.PhoneNumber
             };
-            context.Customers.Add(newCustomer);       
+            context.Customers.Add(newCustomer);
             context.SaveChanges();
 
             // many to many, bridge table gets updated as well
@@ -142,11 +163,11 @@ namespace StoreDatamodel
             };
             context.Storecustomers.Add(newBridge);
             context.SaveChanges();
-                      
+
         }
 
         // same changes, only keep the part that updates tables, move others to class model or console main
-        public void CustomerPlaceOneOrder(COrder order, CStore store, double totalCost )
+        public void CustomerPlaceOneOrder(COrder order, CStore store, double totalCost)
         {
             using var context = new Project0databaseContext(_contextOptions);
             // update order
@@ -176,6 +197,7 @@ namespace StoreDatamodel
 
             var dbStore = context.Stores.Include(x => x.Inventories)
                                                 .First(x => x.Storeloc == order.StoreLocation.Storeloc);
+            // if (dbStore == null) return null;
             // update inventory quantity          
             foreach (var product in order.ProductList)
             {
@@ -188,15 +210,16 @@ namespace StoreDatamodel
                 }
             }
             context.SaveChanges();
-            
-        }    
+
+        }
 
         // refactor
-        public CCustomer GetOneCustomerByNameAndPhone(string firstName,string lastName, string phonenumber)
+        public CCustomer GetOneCustomerByNameAndPhone(string firstName, string lastName, string phonenumber)
         {
             using var context = new Project0databaseContext(_contextOptions);
             var dbCustomer = context.Customers
                              .FirstOrDefault(x => x.Firstname == firstName && x.Lastname == lastName && x.Phonenumber == phonenumber);
+            if (dbCustomer == null) return null;
             CCustomer foundCustomer;
             if (dbCustomer != null)
             {
@@ -207,7 +230,7 @@ namespace StoreDatamodel
             {
                 foundCustomer = new CCustomer();
             }
-                return foundCustomer;  
+            return foundCustomer;
         }
 
         public COrder GetAnOrderByID(string orderid)
@@ -217,11 +240,12 @@ namespace StoreDatamodel
                                     .Include(x => x.Orderproducts)
                                         .ThenInclude(x => x.Product)
                                         .First(x => x.Orderid == orderid);
+            if (dbOrder == null) return null;
             COrder order = new COrder(orderid, new CStore(dbOrder.Storeloc),
                                                new CCustomer(dbOrder.Customer.Customerid, dbOrder.Customer.Firstname,
                                                             dbOrder.Customer.Lastname, dbOrder.Customer.Phonenumber),
                                                dbOrder.Orderedtime, dbOrder.Totalcost);
-            
+
             foreach (var product in dbOrder.Orderproducts)
             {
                 CProduct p = new CProduct(product.Product.Productid, product.Product.Name,
@@ -232,9 +256,17 @@ namespace StoreDatamodel
             return order;
         }
 
-
-        public 
-
-
+        public CProduct GetAProductByNameAndCategory(string name, string category)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbProduct = context.Products.First(x => x.Name == name && x.Category == category);
+            if (dbProduct == null) return null;
+            CProduct p = new CProduct(dbProduct.Productid, dbProduct.Name, dbProduct.Category, dbProduct.Price);
+            return p;
+        }
     }
 }
+
+
+        
+

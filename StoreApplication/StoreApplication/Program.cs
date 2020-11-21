@@ -45,10 +45,23 @@ namespace StoreApplication
                 // CStore store = persist.ReadStoreData();
 
                 // new mvc version
+                // display all store locations to choose from
+                List<CStore> storeBasics = repo.GetAllStores();
+                sd.DisplayAllStores(storeBasics);
+
                 Console.WriteLine("Select a store location first:");
                 string storeLoc = Console.ReadLine();
-                CStore store = repo.GetAStore(storeLoc);
-
+                CStore store = null;
+                while (store == null)
+                {                   
+                    store = repo.GetAStore(storeLoc);
+                    if (NullChecker(store))
+                    {
+                        storeLoc = Console.ReadLine();
+                        continue;
+                    }
+                    else break;                     
+                }
                 // set up inventory, not the same as add products, more like reset inventory
                 InventorySetup(repo, storeLoc, store);
                 Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search a customer\n  4.Display an order ");
@@ -78,7 +91,7 @@ namespace StoreApplication
                     string customerid = CheckAndAddOneCustomer(repo, storeLoc, store, ss);
 
                     // process begins
-                    List<CProduct> products = ProductsSetup();
+                    List<CProduct> products = ProductsSetup(repo);
                     string orderid = OIDGen.Gen();
                     double totalCost = store.CalculateTotalPrice(products);
                     bool isSuccessful = false;
@@ -126,61 +139,89 @@ namespace StoreApplication
 
                 else if (choice == "3")
                 {
-                    Console.WriteLine("Enter Customer's first name");
-                    string firstname = Console.ReadLine();
-                    Console.WriteLine("Enter Customer's last name");
-                    string lastname = Console.ReadLine();
-                    Console.WriteLine("Enter Customer's phone number");
-                    string phonenumber = Console.ReadLine();
+                    while (true)
+                    {
+                        Console.WriteLine("Enter Customer's first name");
+                        string firstname = Console.ReadLine();
+                        Console.WriteLine("Enter Customer's last name");
+                        string lastname = Console.ReadLine();
+                        Console.WriteLine("Enter Customer's phone number");
+                        string phonenumber = Console.ReadLine();
 
-                    CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
-                    if (foundCustomer.Customerid != null)
-                        Console.WriteLine($"{foundCustomer.Customerid} found, customer alreay exist in the database");
-                    else
-                        Console.WriteLine("Customer not found, proceed to option 1 to create a new profile");
+                        CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
+                        if (NullChecker(foundCustomer)) continue;
+                        else
+                        {
+                            Console.WriteLine($"{foundCustomer.Customerid} found, customer alreay exist in the database");
+                            break;
+                        }
+                    }
                 }
                 else if (choice == "4")
                 {
-                    Console.WriteLine("What is the orderid?");
-                    string orderid = Console.ReadLine();
-                    sd.DisplayOneOrder(repo.GetAnOrderByID(orderid));
+                    while (true)
+                    {
+                        Console.WriteLine("What is the orderid?");
+                        string orderid = Console.ReadLine();
+                        COrder foundOrder = repo.GetAnOrderByID(orderid);
+                        if (NullChecker(foundOrder)) continue;
+                        else
+                        {
+                            sd.DisplayOneOrder(foundOrder);
+                            break;
+                        }
+                        // need an option to search by store location, customerid, and orderdata
+                    }
                 }
                 else if (choice == "5")
                 {
-                    // search for a customer
-                    Console.WriteLine("Enter Customer's first name");
-                    string firstname = Console.ReadLine();
-                    Console.WriteLine("Enter Customer's last name");
-                    string lastname = Console.ReadLine();
-                    Console.WriteLine("Enter Customer's phone number");
-                    string phonenumber = Console.ReadLine();
-                    CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
-                    // 
-                    if (foundCustomer.Customerid != null)
-                        sd.DisplayAllOrders(foundCustomer.OrderHistory);
-                    else
-                        Console.WriteLine("Customer not found, proceed to option 1 to create a new profile");
+                    while (true)
+                    {
+                        // same as search for a customer in the beginning
+                        Console.WriteLine("Enter Customer's first name");
+                        string firstname = Console.ReadLine();
+                        Console.WriteLine("Enter Customer's last name");
+                        string lastname = Console.ReadLine();
+                        Console.WriteLine("Enter Customer's phone number");
+                        string phonenumber = Console.ReadLine();
+                        CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
+
+                        if (NullChecker(foundCustomer)) continue;
+                        else
+                        {
+                            sd.DisplayAllOrders(foundCustomer.OrderHistory);
+                            break;
+                        }
+                    }
                 }
                 else if (choice == "6")
                 {
-                    Console.WriteLine("What is the store location you seek?");
-                    string seekLoc = Console.ReadLine();
-                    CStore seekStore = repo.GetAStore(seekLoc);
-                    seekStore.CustomerDict = repo.GetAllCustomersAtOneStore(seekLoc);
-
-                    foreach (var pair in seekStore.CustomerDict)
+                    while (true)
                     {
-                        CCustomer cust = pair.Value;
-                        cust.OrderHistory = repo.GetAllOrdersOfOneCustomer(cust.Customerid, seekStore, cust);
-                        foreach (var order in cust.OrderHistory)
-                        {
-                            order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
-                            order.TotalCost = store.CalculateTotalPrice(order.ProductList);
-                        }
-                        sd.DisplayAllOrders(cust.OrderHistory);
-                    }
+                        Console.WriteLine("What is the store location you seek?");
+                        string seekLoc = Console.ReadLine();
+                        CStore seekStore = repo.GetAStore(seekLoc);
+                        if (NullChecker(seekStore)) continue;
 
-                   
+                        seekStore.CustomerDict = repo.GetAllCustomersAtOneStore(seekLoc);
+
+                        foreach (var pair in seekStore.CustomerDict)
+                        {
+                            CCustomer cust = pair.Value;
+                            cust.OrderHistory = repo.GetAllOrdersOfOneCustomer(cust.Customerid, seekStore, cust);
+                            foreach (var order in cust.OrderHistory)
+                            {
+                                order.ProductList = repo.GetAllProductsOfOneOrder(order.Orderid);
+                                order.TotalCost = store.CalculateTotalPrice(order.ProductList);
+                            }
+                            sd.DisplayAllOrders(cust.OrderHistory);
+                        }
+                    }
+                }
+                // invalid commands
+                else
+                {
+                    Console.WriteLine("Choose one of the options above, other inputs are invalid!");
                 }
 
             }
@@ -206,15 +247,18 @@ namespace StoreApplication
 
         private static string CheckAndAddOneCustomer(StoreRepository repo,string storeLoc,CStore store,ISearch ss)
         {
-            // validation
+            
             Console.WriteLine("What is the customer's first name?");
             string firstname = Console.ReadLine();
             Console.WriteLine("What is the customer's last name?");
             string lastname = Console.ReadLine();
             Console.WriteLine("What is the customer's phone number?");
+            // validation
             string phonenumber = Console.ReadLine();
 
             string customerid;
+            // or use repo.GetOneCustomerByNameAndPhone, check null reference
+            // can delay setting up customer profiles
             // by name or by name and phone
             bool Found = ss.SearchByNameAndPhone(store, firstname, lastname, phonenumber, out customerid);
             if (Found)
@@ -233,15 +277,13 @@ namespace StoreApplication
             return customerid;
         }
 
-        private static List<CProduct> ProductsSetup()
+        private static List<CProduct> ProductsSetup(StoreRepository repo)
         {
             List<CProduct> productList = new List<CProduct>();
-            Console.WriteLine("Setting up products, enter any key to continue, enter 'x' to exit");
+            Console.WriteLine("Puchasing products, enter any key to continue, enter 'x' to exit");
             string init = Console.ReadLine();
             while (init != "x")
-            {
-                Console.WriteLine("Enter Product unique ID");
-                string id = Console.ReadLine();
+            {                 
 
                 Console.WriteLine("Enter Product name");
                 string name = Console.ReadLine();
@@ -249,20 +291,25 @@ namespace StoreApplication
                 Console.WriteLine("Enter Product category");
                 string category = Console.ReadLine();
 
+                /*
                 Console.WriteLine("Enter Product price");
                 string priceStr = Console.ReadLine();
                 double price;
                 Double.TryParse(priceStr, out price);
+                */
 
                 Console.WriteLine("Enter Product quantity");
                 string quantityStr = Console.ReadLine();
                 int quantity;
                 int.TryParse(quantityStr, out quantity);
-
-                CProduct p = new CProduct(id, name, category, price, quantity);
+               
+                CProduct p = repo.GetAProductByNameAndCategory(name, category);
+                if (NullChecker(p)) continue;
+                
+                p.Quantity = quantity;
                 productList.Add(p);
 
-                Console.WriteLine("Press x to end");
+                Console.WriteLine("Press any key to continue, and 'x' to end");
                 init = Console.ReadLine();
             }
             return productList;
@@ -285,7 +332,18 @@ namespace StoreApplication
 
             string connectionString = JsonSerializer.Deserialize<string>(json);
             return connectionString;
-        }     
+        }
+
+        private static bool NullChecker(Object obj)
+        {
+            if (obj == null)
+            {
+                Console.WriteLine("Record not found, make sure your input matches!");
+                return true;
+            }
+            else return false;   
+        }
+
     }
 }
 

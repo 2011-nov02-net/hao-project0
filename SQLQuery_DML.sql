@@ -23,44 +23,31 @@ insert into store(storeloc,storephone) values('River View 4', '4444444444');
 -- total
 insert into orderr(orderid,storeloc,customerid,totalcost) values('o001','Central Ave 1','cus1',1);
 
-/*
-insert into orderr(orderid,storeloc,customerid,totalcost)
-select sum(op.quantity * p.price) 
- from order o
- join orderproduct op on o.orderid = op.orderid
- join product p on op.productid = p.productid
-  );
-*/
+
 insert into orderr(orderid,storeloc,customerid,totalcost) values('o002','South Ave 2','cus2',4);
 insert into orderr(orderid,storeloc,customerid,totalcost) values('o003','Mountain View 3','cus3',9);
 insert into orderr(orderid,storeloc,customerid,totalcost) values('o004','River View 4','cus4',16);
 
+-- insert bridges store - product
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p101',100);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p102',100);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p103',100);
+insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p104',100);
 
 -- insert brideges product - order
 -- processid is auto generated
 -- quantity
 insert into orderproduct(orderid,productid,quantity) values('o001','p101',1);
--- debugging row
-insert into orderproduct(orderid,productid,quantity) values('o001','p101',10);
 insert into orderproduct(orderid,productid,quantity) values('o002','p102',2);
 insert into orderproduct(orderid,productid,quantity) values('o003','p103',3);
 insert into orderproduct(orderid,productid,quantity) values('o004','p104',4);
--- debugging row
-insert into orderproduct(orderid,productid,quantity) values('o001','p101',9);
+
+update Inventory set quantity = 99 where productid = 'p101';
+update Inventory set quantity = 98 where productid = 'p102';
+update Inventory set quantity = 97 where productid = 'p103';
+update Inventory set quantity = 96 where productid = 'p104';
 
 
-
-
-
--- insert bridges store - product
-insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p101',10);
-insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p102',10);
-insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p103',10);
-insert into Inventory(storeloc,productid,quantity) values('Central Ave 1', 'p104',10);
-
-insert into Inventory(storeloc,productid,quantity) values('South Ave 2', 'p102',10);
-insert into Inventory(storeloc,productid,quantity) values('Mountain View 3', 'p103',10);
-insert into Inventory(storeloc,productid,quantity) values('River View 4', 'p104',10);
 
 -- insert bridges store - customer
 insert into storecustomer(storeloc,customerid) values('Central Ave 1','cus1');
@@ -69,22 +56,16 @@ insert into storecustomer(storeloc,customerid) values('Mountain View 3','cus3');
 insert into storecustomer(storeloc,customerid) values('River View 4','cus4');
 
 --
-select* from product;
-select* from orderr;
-select* from customer;
 select* from store;
-select* from orderproduct;
-select* from inventory;
+select* from customer;
 select* from storecustomer;
-
-
-select o.orderid,p.productid,op.quantity,p.price,o.totalcost
-from orderr o 
-join orderproduct op on o.orderid = op.orderid
-join product p on op.productid = p.productid
-
+select* from orderr;
+select* from orderproduct;
+SELECT* from inventory;
+select* from product;
 
 
 
 
+select* from inventory;
 

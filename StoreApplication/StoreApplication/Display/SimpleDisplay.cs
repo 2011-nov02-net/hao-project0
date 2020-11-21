@@ -39,12 +39,11 @@ namespace StoreApplication.Display
            
         }
 
-        public void DisplayOneOrder(Orderr dbOrders)
+        public void DisplayAllStores(List<CStore> stores)
         {
-            Console.WriteLine($"Orderred at: {dbOrders.Storeloc} customerid: {dbOrders.Customerid} time: {dbOrders.Orderedtime}");
-            foreach (var product in dbOrders.Orderproducts)
+            foreach (var store in stores)
             {
-                Console.WriteLine($"ID: {product.Product.Productid}, Name: {product.Product.Name}, Price: {product.Product.Price}, Quantity: {product.Quantity}");
+                Console.WriteLine($" Store address: {store.Storeloc}, phone number: {store.Storephone}\n ");
             }
         }
 
