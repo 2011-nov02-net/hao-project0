@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace StoreLibrary
 {
     /// <summary>
-    /// console order class, has no behaviors
+    /// order class, has no behaviors
     /// </summary>
     public class COrder
     {
@@ -37,7 +37,7 @@ namespace StoreLibrary
 
         /// <summary>
         /// property to record total cost of an order, must set it positive
-        /// total cost should be finalized
+        /// total cost should be finalized 
         /// </summary>
         public double TotalCost {
             get { return totalCost; }
@@ -67,10 +67,8 @@ namespace StoreLibrary
                 }
                 if (quantity >= 500)
                 {
-                    // need to handle rejection
                     throw new ArgumentException("total number of products exceeds maximum");
                 }
-                // set a list
                 productList = value;
             } }
 

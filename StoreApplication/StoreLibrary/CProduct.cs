@@ -5,7 +5,7 @@ using System.Text;
 namespace StoreLibrary
 {
     /// <summary>
-    /// Console product class, has no behaviors
+    /// product class, has no behaviors
     /// </summary>
     public class CProduct
     {
@@ -80,6 +80,5 @@ namespace StoreLibrary
             Category = category;
             Price = price;          
         }
-
     }
 }

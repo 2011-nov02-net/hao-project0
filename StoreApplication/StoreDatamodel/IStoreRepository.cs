@@ -13,18 +13,24 @@ namespace StoreDatamodel
         Dictionary<string, CCustomer> GetAllCustomersAtOneStore(string storeLoc);
         List<COrder> GetAllOrdersOfOneCustomer(string customerid, CStore store, CCustomer customer);
         List<CProduct> GetAllProductsOfOneOrder(string orderid);
+
+
         CCustomer GetOneCustomerByNameAndPhone(string firstName, string lastName, string phonenumber);
         COrder GetAnOrderByID(string orderid);
         CProduct GetAProductByNameAndCategory(string name, string category);
 
-        // all add methods take library model objects, convert them to dbcontext objects and map them to db
-        void StoreAddOneCusomter(string storeLoc, CCustomer customer);
 
+
+        // all add methods take library model objects, convert them to dbcontext objects and map them to db
+        void AddOneStore(CStore store);
+        void StoreAddOneCusomter(string storeLoc, CCustomer customer);
         void CustomerPlaceOneOrder(COrder order, CStore store, double totalCost);
-       
+        void AddOneProduct(CProduct product);
+
 
         // helper methods to display all store locations, only contain location and store phone number
         List<CStore> GetAllStores();
+        IEnumerable<CProduct> GetAllProducts();
 
     }
 }

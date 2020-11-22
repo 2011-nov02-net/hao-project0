@@ -7,7 +7,7 @@ using System.Text;
 namespace StoreLibrary
 {
     /// <summary>
-    /// console customer class, has one behavior to place an order
+    /// customer class, has one behavior to place an order
     /// </summary>
     public class CCustomer
     {
@@ -42,15 +42,15 @@ namespace StoreLibrary
         public CCustomer()
         { }
 
-        //
+        /// <summary>
+        /// parameterized constructor
+        /// </summary>
         public CCustomer(string firstName, string lastName)
         {
             FirstName = firstName;
             LastName = lastName;
-
         }
 
-        //
         public CCustomer(string firstName, string lastName, string phoneNumber)
         {
             FirstName = firstName;
@@ -58,9 +58,6 @@ namespace StoreLibrary
             PhoneNumber = phoneNumber;
         }
 
-        /// <summary>
-        /// parameterized constructor
-        /// </summary>
         public CCustomer(string customerid,string firstName, string lastName, string phoneNumber)
         {
             Customerid = customerid;

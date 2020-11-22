@@ -10,7 +10,7 @@ namespace StoreLibrary.Search
     public class SimpleSearch : ISearch
     {
         /// <summary>
-        /// simple approach to search by name
+        /// simple approach to search by name, returns bool and customerid
         /// </summary>
         public bool SearchByName(CStore store, string firstname, string lastname, out string customerid)
         {
@@ -42,6 +42,9 @@ namespace StoreLibrary.Search
             return false;
         }
 
+        /// <summary>
+        /// take an extra parameter of phone number to guarantee an accurate search
+        /// </summary>
         public bool SearchByNameAndPhone(CStore store, string firstname, string lastname, string phonenumber, out string customerid)
         {
             foreach (var pair in store.CustomerDict)
@@ -56,7 +59,6 @@ namespace StoreLibrary.Search
             customerid = "";
             return false;
         }
-
 
         public bool SearchByNameAndPhone(CStore store, CCustomer customer, out string customerid)
         {

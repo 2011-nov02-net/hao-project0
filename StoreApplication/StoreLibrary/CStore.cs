@@ -5,8 +5,8 @@ using System.Text;
 namespace StoreLibrary
 {
     /// <summary>
-    /// console store class, has multiple behaviors
-    /// can restock, add a customer, update a customer's order history, check and update inventory
+    /// store class, contains several behaviors
+    /// add a customer, update a customer's order history, check and update inventory
     /// </summary>
     public class CStore
     {
@@ -37,7 +37,6 @@ namespace StoreLibrary
         /// </summary>
         public CStore() { }
     
-
         /// <summary>
         /// parameterized constructor
         /// </summary>
@@ -64,7 +63,9 @@ namespace StoreLibrary
             }          
         }
 
-        //
+        /// <summary>
+        /// calculate total cost of an order
+        /// </summary>
         public double CalculateTotalPrice(List<CProduct> productList)
         {
             double total = 0;
@@ -163,16 +164,12 @@ namespace StoreLibrary
         public bool CheckInventory(COrder order)
         {
             foreach (var purchasedProduct in order.ProductList)
-            {
-                // because of reference types, same objects may not be considered the same
-                // try string literals
+            {               
                 string uniqueID = purchasedProduct.UniqueID;
                 CProduct storage;
-                // find the product in the store inventory
                 if (Inventory.TryGetValue(uniqueID, out storage))
                 {
-                    // found
-                    // but not enough 
+                    // found but not enough 
                     if (storage.Quantity < purchasedProduct.Quantity)
                     {
                         return false;
@@ -192,10 +189,9 @@ namespace StoreLibrary
             return true;
         }
 
-
-        // restock options grab all previous and new supply from database
-        // need to clean local inventory so both quantities match
-        // temporary solution, need to have add products in store repository
+        /// <summary>
+        /// used to reset invetory
+        /// </summary>
         public void CleanInventory()
         {
             Inventory = new Dictionary<string, CProduct>();

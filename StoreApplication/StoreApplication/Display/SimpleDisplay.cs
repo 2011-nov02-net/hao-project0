@@ -39,6 +39,9 @@ namespace StoreApplication.Display
            
         }
 
+        /// <summary>
+        /// diaplay location and phone numbers of all stores
+        /// </summary>
         public void DisplayAllStores(List<CStore> stores)
         {
             foreach (var store in stores)

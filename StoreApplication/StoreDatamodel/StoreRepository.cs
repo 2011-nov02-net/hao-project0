@@ -15,15 +15,7 @@ namespace StoreDatamodel
         public StoreRepository(DbContextOptions<Project0databaseContext> contextOptions)
         {
             _contextOptions = contextOptions;
-        }
-
-        public IEnumerable<CProduct> GetAllProducts()
-        {
-            using var context = new Project0databaseContext(_contextOptions);
-            IEnumerable<Product> dbProducts = context.Products.ToList();
-            IEnumerable<CProduct> conProducts = dbProducts.Select(x => new CProduct(x.Productid, x.Name, x.Category, x.Price, 1));
-            return conProducts;
-        }
+        }       
 
         // M V C design
         // re-implementation seperating business and data-access
@@ -35,23 +27,9 @@ namespace StoreDatamodel
             var dbStore = context.Stores.FirstOrDefault(x => x.Storeloc == storeLoc);
             if (dbStore == null) return null;
             // store has no customer profile yet
-            CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);                            
-            return store;
-        }
-
-        /*
-        public CStore GetAMappedStore(string storeLoc)
-        {
-            using var context = new Project0databaseContext(_contextOptions);
-            var dbStore = context.Stores.Include(x => x.Storecustomers).ThenInclude(x => x.Customer)
-                                            .ThenInclude( x => x.Orderrs).ThenInclude(x => x.Orderproducts)
-                                            .ThenInclude( x => x.Product).ThenInclude( x=> x.Inventories)
-                                            .First(x => x.Storeloc == storeLoc);
             CStore store = new CStore(dbStore.Storeloc, dbStore.Storephone);
-            //
             return store;
         }
-        */
 
         // create a dict of products that can be added to a given store
         public List<CProduct> GetInventoryOfAStore(string storeLoc)
@@ -126,19 +104,72 @@ namespace StoreDatamodel
             }
             return products;
         }
-
-        public List<CStore> GetAllStores()
+       
+        public CCustomer GetOneCustomerByNameAndPhone(string firstName, string lastName, string phonenumber)
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbStores = context.Stores.ToList();
-            if (dbStores == null) return null;
-            List<CStore> stores = new List<CStore>();
-            foreach (var store in dbStores)
+            var dbCustomer = context.Customers
+                             .FirstOrDefault(x => x.Firstname == firstName && x.Lastname == lastName && x.Phonenumber == phonenumber);
+            if (dbCustomer == null) return null;
+            CCustomer foundCustomer;
+            if (dbCustomer != null)
             {
-                CStore s = new CStore(store.Storeloc, store.Storephone);
-                stores.Add(s);
+                foundCustomer = new CCustomer(dbCustomer.Customerid,
+                                                    dbCustomer.Firstname, dbCustomer.Lastname, dbCustomer.Phonenumber);
             }
-            return stores;
+            else
+            {
+                foundCustomer = new CCustomer();
+            }
+            return foundCustomer;
+        }
+
+        public COrder GetAnOrderByID(string orderid)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            Orderr dbOrder = context.Orderrs
+                                    .Include(x => x.Orderproducts)
+                                        .ThenInclude(x => x.Product)
+                                        .First(x => x.Orderid == orderid);
+            if (dbOrder == null) return null;
+            COrder order = new COrder(orderid, new CStore(dbOrder.Storeloc),
+                                               new CCustomer(dbOrder.Customer.Customerid, dbOrder.Customer.Firstname,
+                                                            dbOrder.Customer.Lastname, dbOrder.Customer.Phonenumber),
+                                               dbOrder.Orderedtime, dbOrder.Totalcost);
+
+            foreach (var product in dbOrder.Orderproducts)
+            {
+                CProduct p = new CProduct(product.Product.Productid, product.Product.Name,
+                                        product.Product.Category, product.Product.Price, product.Quantity);
+                order.ProductList.Add(p);
+            }
+
+            return order;
+        }
+
+        public CProduct GetAProductByNameAndCategory(string name, string category)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            var dbProduct = context.Products.First(x => x.Name == name && x.Category == category);
+            if (dbProduct == null) return null;
+            CProduct p = new CProduct(dbProduct.Productid, dbProduct.Name, dbProduct.Category, dbProduct.Price);
+            return p;
+        }
+
+
+        //------------------- 4 add     
+
+        public void AddOneStore(CStore store)
+        {
+            using var context = new Project0databaseContext(_contextOptions);
+            var newStore = new Store
+            {
+                Storeloc = store.Storeloc,
+                Storephone = store.Storephone
+            };
+            context.Stores.Add(newStore);
+            context.SaveChanges();
+
         }
 
         public void StoreAddOneCusomter(string storeLoc, CCustomer customer)
@@ -213,56 +244,42 @@ namespace StoreDatamodel
 
         }
 
-        // refactor
-        public CCustomer GetOneCustomerByNameAndPhone(string firstName, string lastName, string phonenumber)
+        public void AddOneProduct(CProduct product)
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbCustomer = context.Customers
-                             .FirstOrDefault(x => x.Firstname == firstName && x.Lastname == lastName && x.Phonenumber == phonenumber);
-            if (dbCustomer == null) return null;
-            CCustomer foundCustomer;
-            if (dbCustomer != null)
+            var newProduct = new Product
             {
-                foundCustomer = new CCustomer(dbCustomer.Customerid,
-                                                    dbCustomer.Firstname, dbCustomer.Lastname, dbCustomer.Phonenumber);
-            }
-            else
-            {
-                foundCustomer = new CCustomer();
-            }
-            return foundCustomer;
+                Productid = product.UniqueID,
+                Name = product.Name,
+                Category = product.Category,
+                Price = product.Price
+            };
+            context.Products.Add(newProduct);
+            context.SaveChanges();
+
         }
 
-        public COrder GetAnOrderByID(string orderid)
+        //------------------ 2 helper
+        public List<CStore> GetAllStores()
         {
             using var context = new Project0databaseContext(_contextOptions);
-            Orderr dbOrder = context.Orderrs
-                                    .Include(x => x.Orderproducts)
-                                        .ThenInclude(x => x.Product)
-                                        .First(x => x.Orderid == orderid);
-            if (dbOrder == null) return null;
-            COrder order = new COrder(orderid, new CStore(dbOrder.Storeloc),
-                                               new CCustomer(dbOrder.Customer.Customerid, dbOrder.Customer.Firstname,
-                                                            dbOrder.Customer.Lastname, dbOrder.Customer.Phonenumber),
-                                               dbOrder.Orderedtime, dbOrder.Totalcost);
-
-            foreach (var product in dbOrder.Orderproducts)
+            var dbStores = context.Stores.ToList();
+            if (dbStores == null) return null;
+            List<CStore> stores = new List<CStore>();
+            foreach (var store in dbStores)
             {
-                CProduct p = new CProduct(product.Product.Productid, product.Product.Name,
-                                        product.Product.Category, product.Product.Price, product.Quantity);
-                order.ProductList.Add(p);
+                CStore s = new CStore(store.Storeloc, store.Storephone);
+                stores.Add(s);
             }
-
-            return order;
+            return stores;
         }
 
-        public CProduct GetAProductByNameAndCategory(string name, string category)
+        public IEnumerable<CProduct> GetAllProducts()
         {
             using var context = new Project0databaseContext(_contextOptions);
-            var dbProduct = context.Products.First(x => x.Name == name && x.Category == category);
-            if (dbProduct == null) return null;
-            CProduct p = new CProduct(dbProduct.Productid, dbProduct.Name, dbProduct.Category, dbProduct.Price);
-            return p;
+            IEnumerable<Product> dbProducts = context.Products.ToList();
+            IEnumerable<CProduct> conProducts = dbProducts.Select(x => new CProduct(x.Productid, x.Name, x.Category, x.Price, 1));
+            return conProducts;
         }
     }
 }

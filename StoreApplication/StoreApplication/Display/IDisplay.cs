@@ -18,6 +18,5 @@ namespace StoreApplication.Display
 
         void DisplayAllStores(List<CStore> stores);
 
-        // void DisplayOneCustomer
     }
 }

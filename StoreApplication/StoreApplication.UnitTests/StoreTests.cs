@@ -7,7 +7,7 @@ using Xunit;
 namespace StoreApplication.UnitTests
 {
     /// <summary>
-    /// unit test cases for console store class
+    /// unit test cases for store class
     /// </summary>
     public class StoreTests
     {
