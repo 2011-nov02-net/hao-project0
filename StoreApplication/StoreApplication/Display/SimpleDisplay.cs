@@ -46,8 +46,9 @@ namespace StoreApplication.Display
         {
             foreach (var store in stores)
             {
-                Console.WriteLine($" Store address: {store.Storeloc}, phone number: {store.Storephone}\n ");
+                Console.WriteLine($" Store address: {store.Storeloc}, phone number: {store.Storephone} ");
             }
+            Console.WriteLine();
         }
 
 

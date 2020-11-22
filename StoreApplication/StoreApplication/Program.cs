@@ -32,43 +32,40 @@ namespace StoreApplication
             IDisplay sd = new SimpleDisplay();
             ISearch ss = new SimpleSearch();
 
-            Console.WriteLine("Welcome to XYZ Enterprise, enter any key to continue, 'x' to exit");
+            // new mvc version
+            // display all store locations to choose from
+            Console.WriteLine("Welcome to XYZ Enterprise, below are a list of our locations:\n ");
+      
+            List<CStore> storeBasics = repo.GetAllStores();
+            sd.DisplayAllStores(storeBasics);
 
-            // all inputs have a validation method to process Ivalid inputs
-            // to do
-            string choice = Console.ReadLine();
-            while (choice != "x")
+            Console.WriteLine("Select a store location first:");
+            string storeLoc = Console.ReadLine();
+            CStore store = null;
+            while (store == null)
+            {
+                store = repo.GetAStore(storeLoc);
+                if (NullChecker(store))
+                {
+                    storeLoc = Console.ReadLine();
+                    continue;
+                }
+                else break;
+            }
+            // set up inventory, not the same as add products, more like reset inventory
+            InventorySetup(repo, storeLoc, store);
+            while (true)
             {
                 // read from databse
                 // string path = "../../../SimplyWriteData.json";
                 // JsonFilePersist persist = new JsonFilePersist(path);
                 // CStore store = persist.ReadStoreData();
-
-                // new mvc version
-                // display all store locations to choose from
-                List<CStore> storeBasics = repo.GetAllStores();
-                sd.DisplayAllStores(storeBasics);
-
-                Console.WriteLine("Select a store location first:");
-                string storeLoc = Console.ReadLine();
-                CStore store = null;
-                while (store == null)
-                {                   
-                    store = repo.GetAStore(storeLoc);
-                    if (NullChecker(store))
-                    {
-                        storeLoc = Console.ReadLine();
-                        continue;
-                    }
-                    else break;                     
-                }
-                // set up inventory, not the same as add products, more like reset inventory
-                InventorySetup(repo, storeLoc, store);
-                Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search a customer\n  4.Display an order ");
+              
+                Console.WriteLine("\nChoose one of the following operations:\n  1.Add a new customer\n  2.Process an order\n  3.Search a customer\n  4.Display an order\n  5.Display orders of a customer\n  6.Display orders of a store\n  7.Exit the console\n");
                 // validation
 
                 bool hasProfileSetup = false;
-                choice = Console.ReadLine();
+                string choice = Console.ReadLine();
                 if (choice == "1")
                 {
                     // avoid repetition if already has all customer profiles
@@ -184,7 +181,7 @@ namespace StoreApplication
                         string lastname = ValidateNotNull(Console.ReadLine());
                         Console.WriteLine("Enter Customer's phone number");
                         string phonenumber = ValidatePhonenumber(Console.ReadLine());
-                        CCustomer foundCustomer = repo.GetOneCustomerByNameAndPhone(firstname, lastname, phonenumber);
+                        CCustomer foundCustomer = repo.GetOneCustomerOrderHistory(firstname, lastname, phonenumber,store);
 
                         if (NullChecker(foundCustomer)) continue;
                         else
@@ -200,6 +197,14 @@ namespace StoreApplication
                     {
                         Console.WriteLine("What is the store location you seek?");
                         string seekLoc = ValidateNotNull(Console.ReadLine());
+                        CStore seekStore = repo.GetOneStoreOrderHistory(seekLoc);
+                        if (NullChecker(seekStore)) continue;
+                        foreach (var pair in seekStore.CustomerDict)
+                        {
+                            sd.DisplayAllOrders(pair.Value.OrderHistory);
+                        }
+
+                        /*
                         CStore seekStore = repo.GetAStore(seekLoc);
                         if (NullChecker(seekStore)) continue;
 
@@ -216,14 +221,19 @@ namespace StoreApplication
                             }
                             sd.DisplayAllOrders(cust.OrderHistory);
                         }
+                        */
                     }
+                }
+                else if (choice == "7")
+                {
+                    Console.WriteLine("Thank you for using XYZ Enterprise!");
+                    break;
                 }
                 // invalid commands
                 else
                 {
                     Console.WriteLine("Choose one of the options above, other inputs are invalid!");
                 }
-
             }
         }
 
