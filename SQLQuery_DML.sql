@@ -5,11 +5,21 @@ insert into product(productid,name,category,price) values('p102','regular coke',
 insert into product(productid,name,category,price) values('p103','pizza','frozen food',3.0);
 insert into product(productid,name,category,price) values('p104','milk','diary',4.0);
 
+--insert login credential
+insert into credential(email,password) values ('JSmith@gmail.com', '52640JSmith');
+insert into credential(email,password) values ('ASavage@gmail.com', '52640ASavage');
+insert into credential(email,password) values ('KKong@gmail.com', '52640KKong');
+insert into credential(email,password) values ('TCook@gmail.com', '52640TCook');
+
 -- insert customer
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus1','John','Smith','6021231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus2','Adam','Savage','4801231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus3','King','Kong','9291231234');
-insert into customer(customerid,firstname,lastname,phonenumber) values('cus4','Tim','Cook','7771231234');
+insert into customer(customerid,firstname,lastname,email,phonenumber) values('cus1','John','Smith','JSmith@gmail.com','6021231234');
+insert into customer(customerid,firstname,lastname,email,phonenumber) values('cus2','Adam','Savage','ASavage@gmail.com','4801231234');
+insert into customer(customerid,firstname,lastname,email,phonenumber) values('cus3','King','Kong','KKong@gmail.com','9291231234');
+insert into customer(customerid,firstname,lastname,email,phonenumber) values('cus4','Tim','Cook','TCook@gmail.com','7771231234');
+
+
+
+
 
 -- insert store
 insert into store(storeloc,storephone) values('Central Ave 1', '1111111111');
@@ -58,6 +68,7 @@ insert into storecustomer(storeloc,customerid) values('River View 4','cus4');
 --
 select* from store;
 select* from customer;
+select* from credential;
 select* from storecustomer;
 select* from orderr;
 select* from orderproduct;
