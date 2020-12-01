@@ -203,7 +203,7 @@ namespace StoreApplication
                         {
                             sd.DisplayAllOrders(pair.Value.OrderHistory);
                         }
-
+                        break;
                         /*
                         CStore seekStore = repo.GetAStore(seekLoc);
                         if (NullChecker(seekStore)) continue;
@@ -221,6 +221,7 @@ namespace StoreApplication
                             }
                             sd.DisplayAllOrders(cust.OrderHistory);
                         }
+                        break;
                         */
                     }
                 }

@@ -17,15 +17,29 @@ create table store
     check(storephone like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 )
 
+create table credential
+(
+    email NVARCHAR(30) primary key not null,
+    password NVARCHAR(30) not null,
+    check(len(password) > 8)
+
+)
+
 create table customer
 (
     customerid NVARCHAR(20) primary key not null,
     firstname NVARCHAR(20) not null,
     lastname NVARCHAR(20) not null,
     phonenumber NVARCHAR(10) not null,
+    email NVARCHAR(30) not null,
     check(len(phonenumber) = 10),
-    check(phonenumber like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+    check(phonenumber like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+    foreign key(email) REFERENCES credential(email)
+        on delete cascade on update cascade
 )
+
+
+
 
 create table orderr
 (
@@ -87,6 +101,6 @@ create table storecustomer
 );
 
 
-drop table storecustomer; drop table inventory; drop table orderproduct; drop table orderr; drop table customer;
-drop table customer; drop table store; drop table product
+drop table storecustomer; drop table inventory; drop table orderproduct; drop table orderr; 
+drop table customer;drop table credential; drop table store; drop table product
 
