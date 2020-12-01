@@ -89,8 +89,9 @@ namespace StoreApplication
 
                     // process begins
                     List<CProduct> products = ProductsSetup(repo);
-                    string randomID = Guid.NewGuid().ToString().Substring(0, 10);
-                    string extraStuff = "extra stuff added to a pull request";
+                    string orderid = OIDGen.Gen();
+                    string extraStuff = "this is outdated";
+                    string myStuff = "my change must be reainted";
                     double totalCost = store.CalculateTotalPrice(products);
                     bool isSuccessful = false;
                     COrder newOrder = new COrder(orderid, store, store.CustomerDict[customerid],
